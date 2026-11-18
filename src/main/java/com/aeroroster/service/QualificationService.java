@@ -7,6 +7,7 @@ import com.aeroroster.persistence.repository.CrewQualificationRepository;
 import com.aeroroster.persistence.repository.CrewRepository;
 import com.aeroroster.persistence.repository.DutyAssignmentRepository;
 import com.aeroroster.persistence.repository.QualificationRepository;
+import com.aeroroster.persistence.repository.AircraftTypeRepository;
 import com.aeroroster.service.dto.CrewQualificationView;
 import com.aeroroster.service.dto.QualificationExpiryRequest;
 import com.aeroroster.service.dto.QualificationGrantRequest;
@@ -31,10 +32,11 @@ public class QualificationService {
     private final ServiceValidation validation;
     private final ServiceTransactions transactions;
     private final ServiceLocks locks;
+    private final AircraftTypeRepository aircraftTypes;
 
     public QualificationService(QualificationRepository requirements, CrewQualificationRepository heldQualifications,
             CrewRepository crew, DutyAssignmentRepository assignments, ServiceValidation validation,
-            ServiceTransactions transactions, ServiceLocks locks) {
+            ServiceTransactions transactions, ServiceLocks locks, AircraftTypeRepository aircraftTypes) {
         this.requirements = requirements;
         this.heldQualifications = heldQualifications;
         this.crew = crew;
@@ -42,6 +44,7 @@ public class QualificationService {
         this.validation = validation;
         this.transactions = transactions;
         this.locks = locks;
+        this.aircraftTypes = aircraftTypes;
     }
 
     public List<QualificationView> requirements() {
@@ -125,5 +128,27 @@ public class QualificationService {
         Qualification qualification = held.getQualification();
         return assignments.findQualificationDepartureTimes(held.getCrew().getId(),
                 qualification.getAircraftType().getId(), qualification.getRequiredRole());
+    }
+
+    public List<QualificationView> requirementsForAircraftType(Long aircraftTypeId) {
+        validation.id(aircraftTypeId);
+        return transactions.read(() -> {
+            if (!aircraftTypes.existsById(aircraftTypeId)) {
+                throw new ResourceNotFoundException("Aircraft type was not found");
+            }
+            return requirements.findByAircraftTypeId(aircraftTypeId).stream().map(ServiceViews::qualification).toList();
+        });
+    }
+
+    public CrewQualificationView getForCrew(Long crewId, Long qualificationId) {
+        validation.id(crewId);
+        validation.id(qualificationId);
+        return transactions.read(() -> {
+            if (!crew.existsById(crewId)) {
+                throw new ResourceNotFoundException("Crew member was not found");
+            }
+            return ServiceViews.crewQualification(heldQualifications.findByCrewIdAndQualificationId(crewId, qualificationId)
+                    .orElseThrow(() -> new ResourceNotFoundException("Crew qualification was not found")));
+        });
     }
 }

@@ -1,6 +1,6 @@
 # AeroRoster — Airline Crew Management & Duty Scheduling
 
-Phase 2.2 core services are committed at `0c8f897`. Phase 2.3 adds crew eligibility, assignment/cancellation history, staffing coverage, exact rolling duty-hour/rest checks and crew unavailability. Scheduling settings are illustrative academic rules. Service contracts, configuration and verification are documented in the implementation notes. [Phase 2.3 notes](docs/08_PHASE23_SCHEDULING.md)
+Phase 2.3 scheduling is committed at `4bfe6c2`. Phase 2.4 exposes the existing services through `/api/v1`, with validated DTOs, paginated histories, structured errors and local OpenAPI documentation. This unauthenticated API is for local development only and must not be publicly deployed as a production-ready service. [REST API handoff](docs/09_PHASE24_REST_API.md)
 
 Source DBMS project: https://github.com/Pragun3691/airline-crew-dbms
 
@@ -40,6 +40,7 @@ Create a Java-based airline operations application for managing airports, aircra
    mvn spring-boot:run
    ```
    Flyway should apply `V1` and `V2` on startup. Go to `http://localhost:8080`.
+   The default bind address is `127.0.0.1`. API documentation is available at `http://127.0.0.1:8080/api-docs/index.html`, with OpenAPI JSON at `/api/v1/openapi.json`. Use same-origin API calls.
 6. Confirm tables via psql:
    ```sql
    \c aeroroster_dev

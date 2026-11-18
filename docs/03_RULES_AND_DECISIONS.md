@@ -43,3 +43,9 @@ Crew deactivation rejects ongoing/future active duties. Aircraft deactivation re
 The owner authorized Phase 2.3 after the Phase 2.2 checkpoint commit. SchedulingPolicy retains the existing duty buffers, ten-hour rest, 14-hour UTC-day cap and inclusive qualification expiry on the UTC departure date. It adds the requested defaults for previously undefined rolling windows, ten hours per rolling 24 hours and 40 hours per rolling seven days. All values are configurable academic settings.
 
 Assignment operations use crew → flight → aircraft row locks, then evaluate current eligibility and persist a duty snapshot. Cancellation preserves history. Scalar projections and refreshed owned child records prevent stale cached safety decisions. Write transactions explicitly require writable READ_COMMITTED isolation. Rules, frontend contracts, calculation details, concurrent transaction evidence and limitations are documented in `08_PHASE23_SCHEDULING.md`.
+
+## Phase 2.4 REST decisions
+
+The owner authorized the REST layer after the Phase 2.3 checkpoint commit. Thin /api/v1 controllers reuse existing service DTOs and business operations. Growing collections use stable PageResponse records and database-backed pagination. Strict JSON binding rejects unknown managed fields, coercion and invalid timestamp shapes. Typed errors map through a shared API error contract, with eligibility details retained on assignment rejection.
+
+The unauthenticated API binds to loopback by default and enforces a same-origin browser policy. OpenAPI and a local documentation viewer are provided without new runtime dependencies. Contracts, security limitations, frontend examples and verification evidence are documented in `09_PHASE24_REST_API.md`.

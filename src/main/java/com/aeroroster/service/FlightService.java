@@ -188,4 +188,15 @@ public class FlightService {
         flight.setDepartureTime(request.departureTime());
         flight.setArrivalTime(request.arrivalTime());
     }
+
+    public Page<FlightView> forAircraft(Long aircraftId, Pageable pageable) {
+        validation.id(aircraftId);
+        validation.pageable(pageable);
+        return transactions.read(() -> {
+            if (!aircraft.existsById(aircraftId)) {
+                throw new ResourceNotFoundException("Aircraft was not found");
+            }
+            return flights.findByAircraftIdOrderByDepartureTimeAscIdAsc(aircraftId, pageable).map(ServiceViews::flight);
+        });
+    }
 }

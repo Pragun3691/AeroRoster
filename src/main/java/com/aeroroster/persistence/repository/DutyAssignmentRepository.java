@@ -6,6 +6,9 @@ import org.springframework.data.repository.query.Param;
 import com.aeroroster.persistence.entity.*;
 import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import java.util.Optional;
 import com.aeroroster.domain.DutyWindow;
 import com.aeroroster.domain.scheduling.AssignmentIdentity;
@@ -66,4 +69,16 @@ public interface DutyAssignmentRepository extends JpaRepository<DutyAssignment, 
             """)
     List<DutyAssignment> findQualificationHistory(@Param("crewId") Long crewId,
             @Param("typeId") Long typeId, @Param("role") CrewRole role);
+
+    @EntityGraph(attributePaths = "flight")
+    Page<DutyAssignment> findByCrewIdOrderByDutyStartTimeAscIdAsc(Long crewId, Pageable pageable);
+
+    @EntityGraph(attributePaths = "flight")
+    Page<DutyAssignment> findByFlightIdOrderByDutyStartTimeAscIdAsc(Long flightId, Pageable pageable);
+
+    @EntityGraph(attributePaths = "flight")
+    Page<DutyAssignment> findByCrewIdAndStatusOrderByDutyStartTimeAscIdAsc(Long crewId, AssignmentStatus status, Pageable pageable);
+
+    @EntityGraph(attributePaths = "flight")
+    Page<DutyAssignment> findByFlightIdAndStatusOrderByDutyStartTimeAscIdAsc(Long flightId, AssignmentStatus status, Pageable pageable);
 }

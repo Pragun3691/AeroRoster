@@ -15,6 +15,8 @@ import com.aeroroster.service.exception.ResourceNotFoundException;
 import com.aeroroster.service.validation.ServiceValidation;
 import java.util.ArrayList;
 import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -186,5 +188,41 @@ public class DutyAssignmentService {
         if (!flights.existsById(id)) {
             throw new ResourceNotFoundException("Flight was not found");
         }
+    }
+
+    public Page<AssignmentView> forFlight(Long flightId, Pageable pageable) {
+        validation.id(flightId);
+        validation.pageable(pageable);
+        return transactions.read(() -> {
+            requireFlight(flightId);
+            return assignments.findByFlightIdAndStatusOrderByDutyStartTimeAscIdAsc(flightId, AssignmentStatus.ACTIVE, pageable).map(ServiceViews::assignment);
+        });
+    }
+
+    public Page<AssignmentView> activeForCrew(Long crewId, Pageable pageable) {
+        validation.id(crewId);
+        validation.pageable(pageable);
+        return transactions.read(() -> {
+            requireCrew(crewId);
+            return assignments.findByCrewIdAndStatusOrderByDutyStartTimeAscIdAsc(crewId, AssignmentStatus.ACTIVE, pageable).map(ServiceViews::assignment);
+        });
+    }
+
+    public Page<AssignmentView> historyForCrew(Long crewId, Pageable pageable) {
+        validation.id(crewId);
+        validation.pageable(pageable);
+        return transactions.read(() -> {
+            requireCrew(crewId);
+            return assignments.findByCrewIdOrderByDutyStartTimeAscIdAsc(crewId, pageable).map(ServiceViews::assignment);
+        });
+    }
+
+    public Page<AssignmentView> historyForFlight(Long flightId, Pageable pageable) {
+        validation.id(flightId);
+        validation.pageable(pageable);
+        return transactions.read(() -> {
+            requireFlight(flightId);
+            return assignments.findByFlightIdOrderByDutyStartTimeAscIdAsc(flightId, pageable).map(ServiceViews::assignment);
+        });
     }
 }

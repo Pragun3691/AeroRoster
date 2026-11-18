@@ -6,6 +6,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import java.time.Instant;
 import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import java.util.Optional;
 import com.aeroroster.domain.DutyWindow;
 
@@ -24,4 +26,6 @@ public interface CrewUnavailabilityRepository extends JpaRepository<CrewUnavaila
 
     @Query("select u from CrewUnavailability u where u.crew.id = :crewId and u.startTime < :end and u.endTime > :start order by u.startTime, u.id")
     List<CrewUnavailability> findOverlapping(@Param("crewId") Long crewId, @Param("start") Instant start, @Param("end") Instant end);
+
+    Page<CrewUnavailability> findByCrewIdOrderByStartTimeAscIdAsc(Long crewId, Pageable pageable);
 }

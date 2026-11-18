@@ -9,6 +9,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationContextInitializer;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.core.annotation.AliasFor;
 
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
@@ -21,6 +22,9 @@ import org.springframework.test.context.ContextConfiguration;
 })
 @ContextConfiguration(initializers = PostgresTest.DatabaseGuard.class)
 public @interface PostgresTest {
+    @AliasFor(annotation = SpringBootTest.class, attribute = "webEnvironment")
+    SpringBootTest.WebEnvironment webEnvironment() default SpringBootTest.WebEnvironment.MOCK;
+
     /** Reject a development URL before datasource and Flyway initialization. */
     class DatabaseGuard implements ApplicationContextInitializer<ConfigurableApplicationContext> {
         @Override

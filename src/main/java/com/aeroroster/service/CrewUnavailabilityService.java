@@ -12,6 +12,8 @@ import com.aeroroster.service.exception.ResourceNotFoundException;
 import com.aeroroster.service.validation.ServiceValidation;
 import java.time.Instant;
 import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -119,5 +121,24 @@ public class CrewUnavailabilityService {
     private UnavailabilityView view(CrewUnavailability period) {
         return new UnavailabilityView(period.getId(), period.getCrew().getId(), period.getStartTime(),
                 period.getEndTime(), period.getReason());
+    }
+
+    public Page<UnavailabilityView> list(Long crewId, Pageable pageable) {
+        validation.id(crewId);
+        validation.pageable(pageable);
+        return transactions.read(() -> {
+            requireCrew(crewId);
+            return unavailability.findByCrewIdOrderByStartTimeAscIdAsc(crewId, pageable).map(this::view);
+        });
+    }
+
+    public UnavailabilityView get(Long crewId, Long id) {
+        validation.id(crewId);
+        validation.id(id);
+        return transactions.read(() -> {
+            requireCrew(crewId);
+            return view(unavailability.findByIdAndCrewId(id, crewId)
+                    .orElseThrow(() -> new ResourceNotFoundException("Crew unavailability was not found")));
+        });
     }
 }

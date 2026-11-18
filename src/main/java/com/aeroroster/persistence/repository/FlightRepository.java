@@ -54,4 +54,7 @@ public interface FlightRepository extends JpaRepository<Flight, Long> {
     Page<Flight> search(@Param("pattern") String pattern, @Param("status") FlightStatus status,
             @Param("aircraftId") Long aircraftId, @Param("fromTime") Instant fromTime,
             @Param("untilTime") Instant untilTime, Pageable pageable);
+
+    @EntityGraph(attributePaths = {"sourceAirport", "destinationAirport", "aircraft", "aircraft.aircraftType"})
+    Page<Flight> findByAircraftIdOrderByDepartureTimeAscIdAsc(Long aircraftId, Pageable pageable);
 }
