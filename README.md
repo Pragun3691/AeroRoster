@@ -1,6 +1,6 @@
 # AeroRoster — Airline Crew Management & Duty Scheduling
 
-Phase 1 foundation is committed at `a6efdb6`. Phase 2.1 implements and verifies the JPA persistence layer. See the current evidence and test setup in the implementation notes. [Phase 2.1 notes](docs/06_PHASE21_PERSISTENCE.md)
+Phase 1 foundation is committed at `a6efdb6` and Phase 2.1 persistence at `c4b65d4`. Phase 2.2 adds validated core Java services, DTO contracts and transaction-safe aircraft scheduling. Service operations, policies, test setup and handoff guidance are documented in the implementation notes. [Phase 2.2 notes](docs/07_PHASE22_SERVICES.md)
 
 Source DBMS project: https://github.com/Pragun3691/airline-crew-dbms
 

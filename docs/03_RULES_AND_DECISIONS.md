@@ -30,4 +30,10 @@ If the Java teacher requires *Core Java / Swing / JavaFX* instead of Spring Boot
 
 The project owner explicitly authorized the existing Spring Boot architecture for Phase 2.1 on 18 November 2026. This milestone implements the existing schema without schema changes. Persistence decisions, relationships, repository responsibilities and verification evidence are recorded in `06_PHASE21_PERSISTENCE.md`.
 
-Scheduling validation and stable-order locking remain requirements for the future transactional service milestone. Repository writes alone provide structural persistence and must be composed within those service transactions when the workflows are implemented.
+Assignment validation and stable-order locking remain requirements for the future assignment service milestone. Repository writes alone provide structural persistence and must be composed within service transactions when the workflows are implemented.
+
+## Phase 2.2 service decisions
+
+The project owner authorized Phase 2.2 on 18 November 2026. Core services use record DTOs, Jakarta validation, typed business errors, an injected UTC Clock and Spring transactional boundaries. Aircraft row locks serialize aircraft occupancy checks. Flight edits lock the flight before both affected aircraft in ascending ID order, and crew/qualification edits share a crew lock. Locked records are refreshed before validation.
+
+Crew deactivation rejects ongoing/future active duties. Aircraft deactivation rejects ongoing/future scheduled flights. Crew role changes, aircraft type changes and qualification mutations protect referenced history. Active assignments prevent material flight edits and cancellation. Completed/cancelled flights are terminal. All detailed policies and the Phase 2.3 locking handoff are in `07_PHASE22_SERVICES.md`.

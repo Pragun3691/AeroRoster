@@ -3,44 +3,23 @@ package com.aeroroster.persistence;
 import com.aeroroster.persistence.entity.*;
 import com.aeroroster.persistence.repository.*;
 import jakarta.persistence.EntityManager;
+import com.aeroroster.support.PostgresTest;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.ApplicationContextInitializer;
-import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 /** Real PostgreSQL, real Flyway migrations, and rollback after each test. */
-@SpringBootTest(properties = {
-    "spring.datasource.url=${TEST_DB_URL:jdbc:postgresql://localhost:5432/aeroroster_test}",
-    "spring.datasource.username=${TEST_DB_USER:postgres}",
-    "spring.datasource.password=${TEST_DB_PASSWORD:}",
-    "spring.jpa.hibernate.ddl-auto=validate"
-})
-@ContextConfiguration(initializers = PersistenceIntegrationTest.TestDatabaseGuard.class)
+@PostgresTest
 @Transactional
 class PersistenceIntegrationTest {
-    /** Runs before datasource/Flyway initialization so a dev URL cannot be migrated. */
-    public static class TestDatabaseGuard
-            implements ApplicationContextInitializer<ConfigurableApplicationContext> {
-        @Override
-        public void initialize(ConfigurableApplicationContext context) {
-            String url = context.getEnvironment().getRequiredProperty("spring.datasource.url");
-            if (!url.matches("jdbc:postgresql://[^/]+/aeroroster_test")) {
-                throw new IllegalStateException("Tests require a dedicated aeroroster_test database URL");
-            }
-        }
-    }
-
     @Autowired EntityManager entityManager;
     @Autowired JdbcTemplate jdbc;
     @Autowired AirportRepository airports;
