@@ -1,0 +1,4066 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "AeroRoster local development API",
+    "version": "1.1.0",
+    "description": "Unauthenticated local development only. API host must be localhost, 127.0.0.1 or IPv6 loopback; Origin, when present, must match scheme, host and port. Duplicate JSON properties are rejected. Do not publicly deploy as a production-ready service. All scheduling limits are illustrative academic settings. Eligibility never reserves a slot. Phase 2.6 frozen baseline: mutable resources expose version; existing-record changes require X-Expected-Version: id:version from the original edit snapshot (428 missing, 409 STALE_VERSION changed)."
+  },
+  "servers": [
+    {
+      "url": "/api/v1"
+    }
+  ],
+  "security": [],
+  "paths": {
+    "/crew": {
+      "post": {
+        "summary": "Create crew",
+        "operationId": "post_crew",
+        "tags": [
+          "crew"
+        ],
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CrewView"
+                }
+              }
+            },
+            "headers": {
+              "Location": {
+                "description": "Canonical relative URI of the created resource",
+                "schema": {
+                  "type": "string",
+                  "format": "uri-reference"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/Api400"
+          },
+          "403": {
+            "$ref": "#/components/responses/Api403"
+          },
+          "404": {
+            "$ref": "#/components/responses/Api404"
+          },
+          "409": {
+            "$ref": "#/components/responses/Api409"
+          },
+          "500": {
+            "$ref": "#/components/responses/Api500"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CrewRequest"
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "Search crew",
+        "operationId": "get_crew",
+        "tags": [
+          "crew"
+        ],
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "maxLength": 200
+            }
+          },
+          {
+            "name": "role",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/CrewRole"
+            }
+          },
+          {
+            "name": "active",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0,
+              "default": 0,
+              "maximum": 2147483647
+            },
+            "description": "Zero-based page; page times size must not exceed 2147483647 (JPA offset limit). Larger offsets return 400 INVALID_PARAMETER."
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 1,
+              "maximum": 200,
+              "default": 25
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CrewPage"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/Api400"
+          },
+          "403": {
+            "$ref": "#/components/responses/Api403"
+          },
+          "404": {
+            "$ref": "#/components/responses/Api404"
+          },
+          "409": {
+            "$ref": "#/components/responses/Api409"
+          },
+          "500": {
+            "$ref": "#/components/responses/Api500"
+          }
+        }
+      }
+    },
+    "/crew/{crewId}": {
+      "get": {
+        "summary": "Get crew",
+        "operationId": "get_crew__crewId_",
+        "tags": [
+          "crew"
+        ],
+        "parameters": [
+          {
+            "name": "crewId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "minimum": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CrewView"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/Api400"
+          },
+          "403": {
+            "$ref": "#/components/responses/Api403"
+          },
+          "404": {
+            "$ref": "#/components/responses/Api404"
+          },
+          "409": {
+            "$ref": "#/components/responses/Api409"
+          },
+          "500": {
+            "$ref": "#/components/responses/Api500"
+          }
+        }
+      },
+      "put": {
+        "summary": "Update crew",
+        "operationId": "put_crew__crewId_",
+        "tags": [
+          "crew"
+        ],
+        "parameters": [
+          {
+            "name": "crewId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "minimum": 1
+            }
+          },
+          {
+            "name": "X-Expected-Version",
+            "in": "header",
+            "required": true,
+            "description": "Original target resource id:version. For qualification expiry/revocation use CrewQualificationView.id (held-link id), not qualificationId. Do not fetch a new token just to retry stale user input.",
+            "schema": {
+              "type": "string",
+              "pattern": "^[1-9][0-9]*:(0|[1-9][0-9]*)$",
+              "maxLength": 39
+            },
+            "example": "12:0"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CrewView"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/Api400"
+          },
+          "403": {
+            "$ref": "#/components/responses/Api403"
+          },
+          "404": {
+            "$ref": "#/components/responses/Api404"
+          },
+          "409": {
+            "$ref": "#/components/responses/Api409"
+          },
+          "500": {
+            "$ref": "#/components/responses/Api500"
+          },
+          "428": {
+            "$ref": "#/components/responses/Api428"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CrewRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/crew/{crewId}/activity": {
+      "patch": {
+        "summary": "Activate or deactivate crew",
+        "operationId": "patch_crew__crewId__activity",
+        "tags": [
+          "crew"
+        ],
+        "parameters": [
+          {
+            "name": "crewId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "minimum": 1
+            }
+          },
+          {
+            "name": "X-Expected-Version",
+            "in": "header",
+            "required": true,
+            "description": "Original target resource id:version. For qualification expiry/revocation use CrewQualificationView.id (held-link id), not qualificationId. Do not fetch a new token just to retry stale user input.",
+            "schema": {
+              "type": "string",
+              "pattern": "^[1-9][0-9]*:(0|[1-9][0-9]*)$",
+              "maxLength": 39
+            },
+            "example": "12:0"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CrewView"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/Api400"
+          },
+          "403": {
+            "$ref": "#/components/responses/Api403"
+          },
+          "404": {
+            "$ref": "#/components/responses/Api404"
+          },
+          "409": {
+            "$ref": "#/components/responses/Api409"
+          },
+          "500": {
+            "$ref": "#/components/responses/Api500"
+          },
+          "428": {
+            "$ref": "#/components/responses/Api428"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ActivityRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/crew/{crewId}/assignments": {
+      "get": {
+        "summary": "Crew assignment history or active duties",
+        "operationId": "get_crew__crewId__assignments",
+        "tags": [
+          "crew"
+        ],
+        "parameters": [
+          {
+            "name": "crewId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "minimum": 1
+            }
+          },
+          {
+            "name": "activeOnly",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0,
+              "default": 0,
+              "maximum": 2147483647
+            },
+            "description": "Zero-based page; page times size must not exceed 2147483647 (JPA offset limit). Larger offsets return 400 INVALID_PARAMETER."
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 1,
+              "maximum": 200,
+              "default": 25
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AssignmentPage"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/Api400"
+          },
+          "403": {
+            "$ref": "#/components/responses/Api403"
+          },
+          "404": {
+            "$ref": "#/components/responses/Api404"
+          },
+          "409": {
+            "$ref": "#/components/responses/Api409"
+          },
+          "500": {
+            "$ref": "#/components/responses/Api500"
+          }
+        }
+      }
+    },
+    "/airports": {
+      "get": {
+        "summary": "Search fixed airport reference data",
+        "operationId": "get_airports",
+        "tags": [
+          "airports"
+        ],
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "maxLength": 200
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AirportView"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/Api400"
+          },
+          "403": {
+            "$ref": "#/components/responses/Api403"
+          },
+          "404": {
+            "$ref": "#/components/responses/Api404"
+          },
+          "409": {
+            "$ref": "#/components/responses/Api409"
+          },
+          "500": {
+            "$ref": "#/components/responses/Api500"
+          }
+        }
+      }
+    },
+    "/airports/{airportId}": {
+      "get": {
+        "summary": "Get airport",
+        "operationId": "get_airports__airportId_",
+        "tags": [
+          "airports"
+        ],
+        "parameters": [
+          {
+            "name": "airportId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "minimum": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AirportView"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/Api400"
+          },
+          "403": {
+            "$ref": "#/components/responses/Api403"
+          },
+          "404": {
+            "$ref": "#/components/responses/Api404"
+          },
+          "409": {
+            "$ref": "#/components/responses/Api409"
+          },
+          "500": {
+            "$ref": "#/components/responses/Api500"
+          }
+        }
+      }
+    },
+    "/aircraft-types": {
+      "get": {
+        "summary": "List fixed aircraft types",
+        "operationId": "get_aircraft_types",
+        "tags": [
+          "aircraft-types"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AircraftTypeView"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/Api400"
+          },
+          "403": {
+            "$ref": "#/components/responses/Api403"
+          },
+          "404": {
+            "$ref": "#/components/responses/Api404"
+          },
+          "409": {
+            "$ref": "#/components/responses/Api409"
+          },
+          "500": {
+            "$ref": "#/components/responses/Api500"
+          }
+        }
+      }
+    },
+    "/aircraft-types/{aircraftTypeId}": {
+      "get": {
+        "summary": "Get aircraft type",
+        "operationId": "get_aircraft_types__aircraftTypeId_",
+        "tags": [
+          "aircraft-types"
+        ],
+        "parameters": [
+          {
+            "name": "aircraftTypeId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "minimum": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AircraftTypeView"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/Api400"
+          },
+          "403": {
+            "$ref": "#/components/responses/Api403"
+          },
+          "404": {
+            "$ref": "#/components/responses/Api404"
+          },
+          "409": {
+            "$ref": "#/components/responses/Api409"
+          },
+          "500": {
+            "$ref": "#/components/responses/Api500"
+          }
+        }
+      }
+    },
+    "/aircraft-types/{aircraftTypeId}/qualifications": {
+      "get": {
+        "summary": "Get type qualification requirements",
+        "operationId": "get_aircraft_types__aircraftTypeId__qualifications",
+        "tags": [
+          "aircraft-types"
+        ],
+        "parameters": [
+          {
+            "name": "aircraftTypeId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "minimum": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/QualificationView"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/Api400"
+          },
+          "403": {
+            "$ref": "#/components/responses/Api403"
+          },
+          "404": {
+            "$ref": "#/components/responses/Api404"
+          },
+          "409": {
+            "$ref": "#/components/responses/Api409"
+          },
+          "500": {
+            "$ref": "#/components/responses/Api500"
+          }
+        }
+      }
+    },
+    "/qualifications": {
+      "get": {
+        "summary": "List qualification requirements",
+        "operationId": "get_qualifications",
+        "tags": [
+          "qualifications"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/QualificationView"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/Api400"
+          },
+          "403": {
+            "$ref": "#/components/responses/Api403"
+          },
+          "404": {
+            "$ref": "#/components/responses/Api404"
+          },
+          "409": {
+            "$ref": "#/components/responses/Api409"
+          },
+          "500": {
+            "$ref": "#/components/responses/Api500"
+          }
+        }
+      }
+    },
+    "/aircraft": {
+      "post": {
+        "summary": "Register aircraft",
+        "operationId": "post_aircraft",
+        "tags": [
+          "aircraft"
+        ],
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AircraftView"
+                }
+              }
+            },
+            "headers": {
+              "Location": {
+                "description": "Canonical relative URI of the created resource",
+                "schema": {
+                  "type": "string",
+                  "format": "uri-reference"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/Api400"
+          },
+          "403": {
+            "$ref": "#/components/responses/Api403"
+          },
+          "404": {
+            "$ref": "#/components/responses/Api404"
+          },
+          "409": {
+            "$ref": "#/components/responses/Api409"
+          },
+          "500": {
+            "$ref": "#/components/responses/Api500"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AircraftRequest"
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "Search aircraft",
+        "operationId": "get_aircraft",
+        "tags": [
+          "aircraft"
+        ],
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "maxLength": 200
+            }
+          },
+          {
+            "name": "active",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "aircraftTypeId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "minimum": 1
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0,
+              "default": 0,
+              "maximum": 2147483647
+            },
+            "description": "Zero-based page; page times size must not exceed 2147483647 (JPA offset limit). Larger offsets return 400 INVALID_PARAMETER."
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 1,
+              "maximum": 200,
+              "default": 25
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AircraftPage"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/Api400"
+          },
+          "403": {
+            "$ref": "#/components/responses/Api403"
+          },
+          "404": {
+            "$ref": "#/components/responses/Api404"
+          },
+          "409": {
+            "$ref": "#/components/responses/Api409"
+          },
+          "500": {
+            "$ref": "#/components/responses/Api500"
+          }
+        }
+      }
+    },
+    "/aircraft/{aircraftId}": {
+      "get": {
+        "summary": "Get aircraft",
+        "operationId": "get_aircraft__aircraftId_",
+        "tags": [
+          "aircraft"
+        ],
+        "parameters": [
+          {
+            "name": "aircraftId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "minimum": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AircraftView"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/Api400"
+          },
+          "403": {
+            "$ref": "#/components/responses/Api403"
+          },
+          "404": {
+            "$ref": "#/components/responses/Api404"
+          },
+          "409": {
+            "$ref": "#/components/responses/Api409"
+          },
+          "500": {
+            "$ref": "#/components/responses/Api500"
+          }
+        }
+      },
+      "put": {
+        "summary": "Update aircraft",
+        "operationId": "put_aircraft__aircraftId_",
+        "tags": [
+          "aircraft"
+        ],
+        "parameters": [
+          {
+            "name": "aircraftId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "minimum": 1
+            }
+          },
+          {
+            "name": "X-Expected-Version",
+            "in": "header",
+            "required": true,
+            "description": "Original target resource id:version. For qualification expiry/revocation use CrewQualificationView.id (held-link id), not qualificationId. Do not fetch a new token just to retry stale user input.",
+            "schema": {
+              "type": "string",
+              "pattern": "^[1-9][0-9]*:(0|[1-9][0-9]*)$",
+              "maxLength": 39
+            },
+            "example": "12:0"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AircraftView"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/Api400"
+          },
+          "403": {
+            "$ref": "#/components/responses/Api403"
+          },
+          "404": {
+            "$ref": "#/components/responses/Api404"
+          },
+          "409": {
+            "$ref": "#/components/responses/Api409"
+          },
+          "500": {
+            "$ref": "#/components/responses/Api500"
+          },
+          "428": {
+            "$ref": "#/components/responses/Api428"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AircraftRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/aircraft/{aircraftId}/activity": {
+      "patch": {
+        "summary": "Activate or deactivate aircraft",
+        "operationId": "patch_aircraft__aircraftId__activity",
+        "tags": [
+          "aircraft"
+        ],
+        "parameters": [
+          {
+            "name": "aircraftId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "minimum": 1
+            }
+          },
+          {
+            "name": "X-Expected-Version",
+            "in": "header",
+            "required": true,
+            "description": "Original target resource id:version. For qualification expiry/revocation use CrewQualificationView.id (held-link id), not qualificationId. Do not fetch a new token just to retry stale user input.",
+            "schema": {
+              "type": "string",
+              "pattern": "^[1-9][0-9]*:(0|[1-9][0-9]*)$",
+              "maxLength": 39
+            },
+            "example": "12:0"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AircraftView"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/Api400"
+          },
+          "403": {
+            "$ref": "#/components/responses/Api403"
+          },
+          "404": {
+            "$ref": "#/components/responses/Api404"
+          },
+          "409": {
+            "$ref": "#/components/responses/Api409"
+          },
+          "500": {
+            "$ref": "#/components/responses/Api500"
+          },
+          "428": {
+            "$ref": "#/components/responses/Api428"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ActivityRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/aircraft/{aircraftId}/flights": {
+      "get": {
+        "summary": "Flights for aircraft",
+        "operationId": "get_aircraft__aircraftId__flights",
+        "tags": [
+          "aircraft"
+        ],
+        "parameters": [
+          {
+            "name": "aircraftId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "minimum": 1
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0,
+              "default": 0,
+              "maximum": 2147483647
+            },
+            "description": "Zero-based page; page times size must not exceed 2147483647 (JPA offset limit). Larger offsets return 400 INVALID_PARAMETER."
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 1,
+              "maximum": 200,
+              "default": 25
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FlightPage"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/Api400"
+          },
+          "403": {
+            "$ref": "#/components/responses/Api403"
+          },
+          "404": {
+            "$ref": "#/components/responses/Api404"
+          },
+          "409": {
+            "$ref": "#/components/responses/Api409"
+          },
+          "500": {
+            "$ref": "#/components/responses/Api500"
+          }
+        }
+      }
+    },
+    "/crew/{crewId}/qualifications": {
+      "get": {
+        "summary": "Crew qualifications",
+        "operationId": "get_crew__crewId__qualifications",
+        "tags": [
+          "crew"
+        ],
+        "parameters": [
+          {
+            "name": "crewId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "minimum": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CrewQualificationView"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/Api400"
+          },
+          "403": {
+            "$ref": "#/components/responses/Api403"
+          },
+          "404": {
+            "$ref": "#/components/responses/Api404"
+          },
+          "409": {
+            "$ref": "#/components/responses/Api409"
+          },
+          "500": {
+            "$ref": "#/components/responses/Api500"
+          }
+        }
+      },
+      "post": {
+        "summary": "Grant qualification",
+        "operationId": "post_crew__crewId__qualifications",
+        "tags": [
+          "crew"
+        ],
+        "parameters": [
+          {
+            "name": "crewId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "minimum": 1
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CrewQualificationView"
+                }
+              }
+            },
+            "headers": {
+              "Location": {
+                "description": "Canonical relative URI of the created resource",
+                "schema": {
+                  "type": "string",
+                  "format": "uri-reference"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/Api400"
+          },
+          "403": {
+            "$ref": "#/components/responses/Api403"
+          },
+          "404": {
+            "$ref": "#/components/responses/Api404"
+          },
+          "409": {
+            "$ref": "#/components/responses/Api409"
+          },
+          "500": {
+            "$ref": "#/components/responses/Api500"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/QualificationGrantRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/crew/{crewId}/qualifications/{qualificationId}": {
+      "get": {
+        "summary": "Get held qualification",
+        "operationId": "get_crew__crewId__qualifications__qualificationId_",
+        "tags": [
+          "crew"
+        ],
+        "parameters": [
+          {
+            "name": "crewId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "minimum": 1
+            }
+          },
+          {
+            "name": "qualificationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "minimum": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CrewQualificationView"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/Api400"
+          },
+          "403": {
+            "$ref": "#/components/responses/Api403"
+          },
+          "404": {
+            "$ref": "#/components/responses/Api404"
+          },
+          "409": {
+            "$ref": "#/components/responses/Api409"
+          },
+          "500": {
+            "$ref": "#/components/responses/Api500"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Revoke unused qualification",
+        "operationId": "delete_crew__crewId__qualifications__qualificationId_",
+        "tags": [
+          "crew"
+        ],
+        "parameters": [
+          {
+            "name": "crewId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "minimum": 1
+            }
+          },
+          {
+            "name": "qualificationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "minimum": 1
+            }
+          },
+          {
+            "name": "X-Expected-Version",
+            "in": "header",
+            "required": true,
+            "description": "Original target resource id:version. For qualification expiry/revocation use CrewQualificationView.id (held-link id), not qualificationId. Do not fetch a new token just to retry stale user input.",
+            "schema": {
+              "type": "string",
+              "pattern": "^[1-9][0-9]*:(0|[1-9][0-9]*)$",
+              "maxLength": 39
+            },
+            "example": "12:0"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No content"
+          },
+          "400": {
+            "$ref": "#/components/responses/Api400"
+          },
+          "403": {
+            "$ref": "#/components/responses/Api403"
+          },
+          "404": {
+            "$ref": "#/components/responses/Api404"
+          },
+          "409": {
+            "$ref": "#/components/responses/Api409"
+          },
+          "500": {
+            "$ref": "#/components/responses/Api500"
+          },
+          "428": {
+            "$ref": "#/components/responses/Api428"
+          }
+        }
+      }
+    },
+    "/crew/{crewId}/qualifications/{qualificationId}/expiry": {
+      "put": {
+        "summary": "Update qualification expiry",
+        "operationId": "put_crew__crewId__qualifications__qualificationId__expiry",
+        "tags": [
+          "crew"
+        ],
+        "parameters": [
+          {
+            "name": "crewId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "minimum": 1
+            }
+          },
+          {
+            "name": "qualificationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "minimum": 1
+            }
+          },
+          {
+            "name": "X-Expected-Version",
+            "in": "header",
+            "required": true,
+            "description": "Original target resource id:version. For qualification expiry/revocation use CrewQualificationView.id (held-link id), not qualificationId. Do not fetch a new token just to retry stale user input.",
+            "schema": {
+              "type": "string",
+              "pattern": "^[1-9][0-9]*:(0|[1-9][0-9]*)$",
+              "maxLength": 39
+            },
+            "example": "12:0"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CrewQualificationView"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/Api400"
+          },
+          "403": {
+            "$ref": "#/components/responses/Api403"
+          },
+          "404": {
+            "$ref": "#/components/responses/Api404"
+          },
+          "409": {
+            "$ref": "#/components/responses/Api409"
+          },
+          "500": {
+            "$ref": "#/components/responses/Api500"
+          },
+          "428": {
+            "$ref": "#/components/responses/Api428"
+          }
+        },
+        "description": "qualificationId identifies the requirement, not the held-link ID. validUntil must be present; null explicitly makes it open-ended.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExpiryUpdateRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/flights": {
+      "post": {
+        "summary": "Create flight",
+        "operationId": "post_flights",
+        "tags": [
+          "flights"
+        ],
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FlightView"
+                }
+              }
+            },
+            "headers": {
+              "Location": {
+                "description": "Canonical relative URI of the created resource",
+                "schema": {
+                  "type": "string",
+                  "format": "uri-reference"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/Api400"
+          },
+          "403": {
+            "$ref": "#/components/responses/Api403"
+          },
+          "404": {
+            "$ref": "#/components/responses/Api404"
+          },
+          "409": {
+            "$ref": "#/components/responses/Api409"
+          },
+          "500": {
+            "$ref": "#/components/responses/Api500"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FlightRequest"
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "Search scheduled instances",
+        "operationId": "get_flights",
+        "tags": [
+          "flights"
+        ],
+        "parameters": [
+          {
+            "name": "flightNumber",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "maxLength": 200
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/FlightStatus"
+            }
+          },
+          {
+            "name": "aircraftId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "minimum": 1
+            }
+          },
+          {
+            "name": "departureFrom",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time",
+              "description": "ISO-8601 timestamp with Z or explicit offset on input. Responses normalize to UTC Z."
+            }
+          },
+          {
+            "name": "departureUntil",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time",
+              "description": "ISO-8601 timestamp with Z or explicit offset on input. Responses normalize to UTC Z."
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0,
+              "default": 0,
+              "maximum": 2147483647
+            },
+            "description": "Zero-based page; page times size must not exceed 2147483647 (JPA offset limit). Larger offsets return 400 INVALID_PARAMETER."
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 1,
+              "maximum": 200,
+              "default": 25
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FlightPage"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/Api400"
+          },
+          "403": {
+            "$ref": "#/components/responses/Api403"
+          },
+          "404": {
+            "$ref": "#/components/responses/Api404"
+          },
+          "409": {
+            "$ref": "#/components/responses/Api409"
+          },
+          "500": {
+            "$ref": "#/components/responses/Api500"
+          }
+        },
+        "description": "Departure range is inclusive from and exclusive until. Either bound may be omitted."
+      }
+    },
+    "/flights/{flightId}": {
+      "get": {
+        "summary": "Get flight",
+        "operationId": "get_flights__flightId_",
+        "tags": [
+          "flights"
+        ],
+        "parameters": [
+          {
+            "name": "flightId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "minimum": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FlightView"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/Api400"
+          },
+          "403": {
+            "$ref": "#/components/responses/Api403"
+          },
+          "404": {
+            "$ref": "#/components/responses/Api404"
+          },
+          "409": {
+            "$ref": "#/components/responses/Api409"
+          },
+          "500": {
+            "$ref": "#/components/responses/Api500"
+          }
+        }
+      },
+      "put": {
+        "summary": "Update flight details",
+        "operationId": "put_flights__flightId_",
+        "tags": [
+          "flights"
+        ],
+        "parameters": [
+          {
+            "name": "flightId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "minimum": 1
+            }
+          },
+          {
+            "name": "X-Expected-Version",
+            "in": "header",
+            "required": true,
+            "description": "Original target resource id:version. For qualification expiry/revocation use CrewQualificationView.id (held-link id), not qualificationId. Do not fetch a new token just to retry stale user input.",
+            "schema": {
+              "type": "string",
+              "pattern": "^[1-9][0-9]*:(0|[1-9][0-9]*)$",
+              "maxLength": 39
+            },
+            "example": "12:0"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FlightView"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/Api400"
+          },
+          "403": {
+            "$ref": "#/components/responses/Api403"
+          },
+          "404": {
+            "$ref": "#/components/responses/Api404"
+          },
+          "409": {
+            "$ref": "#/components/responses/Api409"
+          },
+          "500": {
+            "$ref": "#/components/responses/Api500"
+          },
+          "428": {
+            "$ref": "#/components/responses/Api428"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FlightRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/flights/{flightId}/status": {
+      "patch": {
+        "summary": "Change flight status",
+        "operationId": "patch_flights__flightId__status",
+        "tags": [
+          "flights"
+        ],
+        "parameters": [
+          {
+            "name": "flightId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "minimum": 1
+            }
+          },
+          {
+            "name": "X-Expected-Version",
+            "in": "header",
+            "required": true,
+            "description": "Original target resource id:version. For qualification expiry/revocation use CrewQualificationView.id (held-link id), not qualificationId. Do not fetch a new token just to retry stale user input.",
+            "schema": {
+              "type": "string",
+              "pattern": "^[1-9][0-9]*:(0|[1-9][0-9]*)$",
+              "maxLength": 39
+            },
+            "example": "12:0"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FlightView"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/Api400"
+          },
+          "403": {
+            "$ref": "#/components/responses/Api403"
+          },
+          "404": {
+            "$ref": "#/components/responses/Api404"
+          },
+          "409": {
+            "$ref": "#/components/responses/Api409"
+          },
+          "500": {
+            "$ref": "#/components/responses/Api500"
+          },
+          "428": {
+            "$ref": "#/components/responses/Api428"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FlightStatusRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/flights/{flightId}/cancellation": {
+      "put": {
+        "summary": "Cancel flight after assignment resolution",
+        "operationId": "put_flights__flightId__cancellation",
+        "tags": [
+          "flights"
+        ],
+        "parameters": [
+          {
+            "name": "flightId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "minimum": 1
+            }
+          },
+          {
+            "name": "X-Expected-Version",
+            "in": "header",
+            "required": true,
+            "description": "Original target resource id:version. For qualification expiry/revocation use CrewQualificationView.id (held-link id), not qualificationId. Do not fetch a new token just to retry stale user input.",
+            "schema": {
+              "type": "string",
+              "pattern": "^[1-9][0-9]*:(0|[1-9][0-9]*)$",
+              "maxLength": 39
+            },
+            "example": "12:0"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FlightView"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/Api400"
+          },
+          "403": {
+            "$ref": "#/components/responses/Api403"
+          },
+          "404": {
+            "$ref": "#/components/responses/Api404"
+          },
+          "409": {
+            "$ref": "#/components/responses/Api409"
+          },
+          "500": {
+            "$ref": "#/components/responses/Api500"
+          },
+          "428": {
+            "$ref": "#/components/responses/Api428"
+          }
+        },
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EmptyRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/flights/{flightId}/assignments": {
+      "get": {
+        "summary": "Assigned crew or flight history",
+        "operationId": "get_flights__flightId__assignments",
+        "tags": [
+          "flights"
+        ],
+        "parameters": [
+          {
+            "name": "flightId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "minimum": 1
+            }
+          },
+          {
+            "name": "activeOnly",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": true
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0,
+              "default": 0,
+              "maximum": 2147483647
+            },
+            "description": "Zero-based page; page times size must not exceed 2147483647 (JPA offset limit). Larger offsets return 400 INVALID_PARAMETER."
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 1,
+              "maximum": 200,
+              "default": 25
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AssignmentPage"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/Api400"
+          },
+          "403": {
+            "$ref": "#/components/responses/Api403"
+          },
+          "404": {
+            "$ref": "#/components/responses/Api404"
+          },
+          "409": {
+            "$ref": "#/components/responses/Api409"
+          },
+          "500": {
+            "$ref": "#/components/responses/Api500"
+          }
+        }
+      }
+    },
+    "/flights/{flightId}/coverage": {
+      "get": {
+        "summary": "Minimum staffing coverage",
+        "operationId": "get_flights__flightId__coverage",
+        "tags": [
+          "flights"
+        ],
+        "parameters": [
+          {
+            "name": "flightId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "minimum": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FlightCrewCoverage"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/Api400"
+          },
+          "403": {
+            "$ref": "#/components/responses/Api403"
+          },
+          "404": {
+            "$ref": "#/components/responses/Api404"
+          },
+          "409": {
+            "$ref": "#/components/responses/Api409"
+          },
+          "500": {
+            "$ref": "#/components/responses/Api500"
+          }
+        }
+      }
+    },
+    "/assignments/eligibility": {
+      "post": {
+        "summary": "Preview eligibility",
+        "operationId": "post_assignments_eligibility",
+        "tags": [
+          "assignments"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EligibilityDecision"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/Api400"
+          },
+          "403": {
+            "$ref": "#/components/responses/Api403"
+          },
+          "404": {
+            "$ref": "#/components/responses/Api404"
+          },
+          "409": {
+            "$ref": "#/components/responses/Api409"
+          },
+          "500": {
+            "$ref": "#/components/responses/Api500"
+          }
+        },
+        "description": "Always advisory. Ineligible decisions, including missing crew/flight reasons, return 200. A later assignment performs a transactional recheck.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AssignmentRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/assignments": {
+      "post": {
+        "summary": "Assign crew",
+        "operationId": "post_assignments",
+        "tags": [
+          "assignments"
+        ],
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AssignmentView"
+                }
+              }
+            },
+            "headers": {
+              "Location": {
+                "description": "Canonical relative URI of the created resource",
+                "schema": {
+                  "type": "string",
+                  "format": "uri-reference"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/Api400"
+          },
+          "403": {
+            "$ref": "#/components/responses/Api403"
+          },
+          "404": {
+            "$ref": "#/components/responses/Api404"
+          },
+          "409": {
+            "$ref": "#/components/responses/Api409"
+          },
+          "500": {
+            "$ref": "#/components/responses/Api500"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AssignmentRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/assignments/{assignmentId}": {
+      "get": {
+        "summary": "Get assignment",
+        "operationId": "get_assignments__assignmentId_",
+        "tags": [
+          "assignments"
+        ],
+        "parameters": [
+          {
+            "name": "assignmentId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "minimum": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AssignmentView"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/Api400"
+          },
+          "403": {
+            "$ref": "#/components/responses/Api403"
+          },
+          "404": {
+            "$ref": "#/components/responses/Api404"
+          },
+          "409": {
+            "$ref": "#/components/responses/Api409"
+          },
+          "500": {
+            "$ref": "#/components/responses/Api500"
+          }
+        }
+      }
+    },
+    "/assignments/{assignmentId}/cancellation": {
+      "put": {
+        "summary": "Cancel assignment retaining history",
+        "operationId": "put_assignments__assignmentId__cancellation",
+        "tags": [
+          "assignments"
+        ],
+        "parameters": [
+          {
+            "name": "assignmentId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "minimum": 1
+            }
+          },
+          {
+            "name": "X-Expected-Version",
+            "in": "header",
+            "required": true,
+            "description": "Original target resource id:version. For qualification expiry/revocation use CrewQualificationView.id (held-link id), not qualificationId. Do not fetch a new token just to retry stale user input.",
+            "schema": {
+              "type": "string",
+              "pattern": "^[1-9][0-9]*:(0|[1-9][0-9]*)$",
+              "maxLength": 39
+            },
+            "example": "12:0"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AssignmentView"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/Api400"
+          },
+          "403": {
+            "$ref": "#/components/responses/Api403"
+          },
+          "404": {
+            "$ref": "#/components/responses/Api404"
+          },
+          "409": {
+            "$ref": "#/components/responses/Api409"
+          },
+          "500": {
+            "$ref": "#/components/responses/Api500"
+          },
+          "428": {
+            "$ref": "#/components/responses/Api428"
+          }
+        },
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EmptyRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/assignments/{assignmentId}/reassignments": {
+      "post": {
+        "summary": "Reassign from cancelled history",
+        "operationId": "post_assignments__assignmentId__reassignments",
+        "tags": [
+          "assignments"
+        ],
+        "parameters": [
+          {
+            "name": "assignmentId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "minimum": 1
+            }
+          },
+          {
+            "name": "X-Expected-Version",
+            "in": "header",
+            "required": true,
+            "description": "Original target resource id:version. For qualification expiry/revocation use CrewQualificationView.id (held-link id), not qualificationId. Do not fetch a new token just to retry stale user input.",
+            "schema": {
+              "type": "string",
+              "pattern": "^[1-9][0-9]*:(0|[1-9][0-9]*)$",
+              "maxLength": 39
+            },
+            "example": "12:0"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AssignmentView"
+                }
+              }
+            },
+            "headers": {
+              "Location": {
+                "description": "Canonical relative URI of the created resource",
+                "schema": {
+                  "type": "string",
+                  "format": "uri-reference"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/Api400"
+          },
+          "403": {
+            "$ref": "#/components/responses/Api403"
+          },
+          "404": {
+            "$ref": "#/components/responses/Api404"
+          },
+          "409": {
+            "$ref": "#/components/responses/Api409"
+          },
+          "500": {
+            "$ref": "#/components/responses/Api500"
+          },
+          "428": {
+            "$ref": "#/components/responses/Api428"
+          }
+        },
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EmptyRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/crew/{crewId}/unavailability": {
+      "post": {
+        "summary": "Add unavailable period",
+        "operationId": "post_crew__crewId__unavailability",
+        "tags": [
+          "crew"
+        ],
+        "parameters": [
+          {
+            "name": "crewId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "minimum": 1
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnavailabilityView"
+                }
+              }
+            },
+            "headers": {
+              "Location": {
+                "description": "Canonical relative URI of the created resource",
+                "schema": {
+                  "type": "string",
+                  "format": "uri-reference"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/Api400"
+          },
+          "403": {
+            "$ref": "#/components/responses/Api403"
+          },
+          "404": {
+            "$ref": "#/components/responses/Api404"
+          },
+          "409": {
+            "$ref": "#/components/responses/Api409"
+          },
+          "500": {
+            "$ref": "#/components/responses/Api500"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UnavailabilityRequest"
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "List unavailable periods",
+        "operationId": "get_crew__crewId__unavailability",
+        "tags": [
+          "crew"
+        ],
+        "parameters": [
+          {
+            "name": "crewId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "minimum": 1
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0,
+              "default": 0,
+              "maximum": 2147483647
+            },
+            "description": "Zero-based page; page times size must not exceed 2147483647 (JPA offset limit). Larger offsets return 400 INVALID_PARAMETER."
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 1,
+              "maximum": 200,
+              "default": 25
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnavailabilityPage"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/Api400"
+          },
+          "403": {
+            "$ref": "#/components/responses/Api403"
+          },
+          "404": {
+            "$ref": "#/components/responses/Api404"
+          },
+          "409": {
+            "$ref": "#/components/responses/Api409"
+          },
+          "500": {
+            "$ref": "#/components/responses/Api500"
+          }
+        }
+      }
+    },
+    "/crew/{crewId}/unavailability/{periodId}": {
+      "get": {
+        "summary": "Get unavailable period",
+        "operationId": "get_crew__crewId__unavailability__periodId_",
+        "tags": [
+          "crew"
+        ],
+        "parameters": [
+          {
+            "name": "crewId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "minimum": 1
+            }
+          },
+          {
+            "name": "periodId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "minimum": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnavailabilityView"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/Api400"
+          },
+          "403": {
+            "$ref": "#/components/responses/Api403"
+          },
+          "404": {
+            "$ref": "#/components/responses/Api404"
+          },
+          "409": {
+            "$ref": "#/components/responses/Api409"
+          },
+          "500": {
+            "$ref": "#/components/responses/Api500"
+          }
+        }
+      },
+      "put": {
+        "summary": "Update unavailable period",
+        "operationId": "put_crew__crewId__unavailability__periodId_",
+        "tags": [
+          "crew"
+        ],
+        "parameters": [
+          {
+            "name": "crewId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "minimum": 1
+            }
+          },
+          {
+            "name": "periodId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "minimum": 1
+            }
+          },
+          {
+            "name": "X-Expected-Version",
+            "in": "header",
+            "required": true,
+            "description": "Original target resource id:version. For qualification expiry/revocation use CrewQualificationView.id (held-link id), not qualificationId. Do not fetch a new token just to retry stale user input.",
+            "schema": {
+              "type": "string",
+              "pattern": "^[1-9][0-9]*:(0|[1-9][0-9]*)$",
+              "maxLength": 39
+            },
+            "example": "12:0"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnavailabilityView"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/Api400"
+          },
+          "403": {
+            "$ref": "#/components/responses/Api403"
+          },
+          "404": {
+            "$ref": "#/components/responses/Api404"
+          },
+          "409": {
+            "$ref": "#/components/responses/Api409"
+          },
+          "500": {
+            "$ref": "#/components/responses/Api500"
+          },
+          "428": {
+            "$ref": "#/components/responses/Api428"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UnavailabilityRequest"
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Remove unavailable period",
+        "operationId": "delete_crew__crewId__unavailability__periodId_",
+        "tags": [
+          "crew"
+        ],
+        "parameters": [
+          {
+            "name": "crewId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "minimum": 1
+            }
+          },
+          {
+            "name": "periodId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "minimum": 1
+            }
+          },
+          {
+            "name": "X-Expected-Version",
+            "in": "header",
+            "required": true,
+            "description": "Original target resource id:version. For qualification expiry/revocation use CrewQualificationView.id (held-link id), not qualificationId. Do not fetch a new token just to retry stale user input.",
+            "schema": {
+              "type": "string",
+              "pattern": "^[1-9][0-9]*:(0|[1-9][0-9]*)$",
+              "maxLength": 39
+            },
+            "example": "12:0"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No content"
+          },
+          "400": {
+            "$ref": "#/components/responses/Api400"
+          },
+          "403": {
+            "$ref": "#/components/responses/Api403"
+          },
+          "404": {
+            "$ref": "#/components/responses/Api404"
+          },
+          "409": {
+            "$ref": "#/components/responses/Api409"
+          },
+          "500": {
+            "$ref": "#/components/responses/Api500"
+          },
+          "428": {
+            "$ref": "#/components/responses/Api428"
+          }
+        }
+      }
+    },
+    "/crew/{crewId}/unavailability/conflicts": {
+      "get": {
+        "summary": "Check unavailable-time intersection",
+        "operationId": "get_crew__crewId__unavailability_conflicts",
+        "tags": [
+          "crew"
+        ],
+        "parameters": [
+          {
+            "name": "crewId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "minimum": 1
+            }
+          },
+          {
+            "name": "start",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time",
+              "description": "ISO-8601 timestamp with Z or explicit offset on input. Responses normalize to UTC Z."
+            }
+          },
+          {
+            "name": "end",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time",
+              "description": "ISO-8601 timestamp with Z or explicit offset on input. Responses normalize to UTC Z."
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnavailabilityConflictView"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/Api400"
+          },
+          "403": {
+            "$ref": "#/components/responses/Api403"
+          },
+          "404": {
+            "$ref": "#/components/responses/Api404"
+          },
+          "409": {
+            "$ref": "#/components/responses/Api409"
+          },
+          "500": {
+            "$ref": "#/components/responses/Api500"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "CrewRole": {
+        "type": "string",
+        "enum": [
+          "PILOT",
+          "COPILOT",
+          "CABIN_CREW"
+        ]
+      },
+      "FlightStatus": {
+        "type": "string",
+        "enum": [
+          "SCHEDULED",
+          "COMPLETED",
+          "CANCELLED"
+        ]
+      },
+      "AssignmentStatus": {
+        "type": "string",
+        "enum": [
+          "ACTIVE",
+          "CANCELLED"
+        ]
+      },
+      "SchedulingReasonCode": {
+        "type": "string",
+        "enum": [
+          "CREW_NOT_FOUND",
+          "FLIGHT_NOT_FOUND",
+          "CREW_INACTIVE",
+          "FLIGHT_NOT_SCHEDULED",
+          "AIRCRAFT_INACTIVE",
+          "ROLE_MISMATCH",
+          "MISSING_QUALIFICATION",
+          "QUALIFICATION_EXPIRED",
+          "INVALID_DUTY_WINDOW",
+          "DUPLICATE_ACTIVE_ASSIGNMENT",
+          "FLIGHT_ROLE_FILLED",
+          "CREW_UNAVAILABLE",
+          "CREW_TIME_CONFLICT",
+          "INSUFFICIENT_REST",
+          "ROLLING_24_HOUR_LIMIT",
+          "ROLLING_7_DAY_LIMIT",
+          "UTC_DAILY_DUTY_LIMIT",
+          "MISSING_PILOT",
+          "MISSING_COPILOT",
+          "MISSING_CABIN_CREW",
+          "EXCESS_PILOTS",
+          "EXCESS_COPILOTS"
+        ]
+      },
+      "CrewRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "role": {
+            "$ref": "#/components/schemas/CrewRole"
+          },
+          "licenseNo": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 30
+          },
+          "experienceYears": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "contactNo": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 20,
+            "description": "7 to 15 digits, optional leading plus and permitted spaces/parentheses/hyphens"
+          }
+        },
+        "required": [
+          "name",
+          "role",
+          "licenseNo",
+          "experienceYears",
+          "contactNo"
+        ]
+      },
+      "AircraftRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "registration": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 24
+          },
+          "aircraftTypeId": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 1
+          }
+        },
+        "required": [
+          "registration",
+          "aircraftTypeId"
+        ]
+      },
+      "FlightRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "flightNumber": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 15
+          },
+          "sourceAirportId": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 1
+          },
+          "destinationAirportId": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 1
+          },
+          "aircraftId": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 1
+          },
+          "departureTime": {
+            "type": "string",
+            "format": "date-time",
+            "description": "ISO-8601 timestamp with Z or explicit offset on input. Responses normalize to UTC Z."
+          },
+          "arrivalTime": {
+            "type": "string",
+            "format": "date-time",
+            "description": "ISO-8601 timestamp with Z or explicit offset on input. Responses normalize to UTC Z."
+          }
+        },
+        "required": [
+          "flightNumber",
+          "sourceAirportId",
+          "destinationAirportId",
+          "aircraftId",
+          "departureTime",
+          "arrivalTime"
+        ]
+      },
+      "AssignmentRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "crewId": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 1
+          },
+          "flightId": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 1
+          },
+          "assignedRole": {
+            "$ref": "#/components/schemas/CrewRole"
+          }
+        },
+        "required": [
+          "crewId",
+          "flightId",
+          "assignedRole"
+        ]
+      },
+      "QualificationGrantRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "qualificationId": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 1
+          },
+          "validUntil": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "qualificationId"
+        ]
+      },
+      "ExpiryUpdateRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "validUntil": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "validUntil"
+        ]
+      },
+      "ActivityRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "active": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "active"
+        ]
+      },
+      "FlightStatusRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "status": {
+            "$ref": "#/components/schemas/FlightStatus"
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "UnavailabilityRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "startTime": {
+            "type": "string",
+            "format": "date-time",
+            "description": "ISO-8601 timestamp with Z or explicit offset on input. Responses normalize to UTC Z."
+          },
+          "endTime": {
+            "type": "string",
+            "format": "date-time",
+            "description": "ISO-8601 timestamp with Z or explicit offset on input. Responses normalize to UTC Z."
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          }
+        },
+        "required": [
+          "startTime",
+          "endTime",
+          "reason"
+        ]
+      },
+      "EmptyRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {},
+        "required": []
+      },
+      "CrewView": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 1
+          },
+          "name": {
+            "type": "string"
+          },
+          "role": {
+            "$ref": "#/components/schemas/CrewRole"
+          },
+          "licenseNo": {
+            "type": "string"
+          },
+          "experienceYears": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "contactNo": {
+            "type": "string"
+          },
+          "active": {
+            "type": "boolean"
+          },
+          "version": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0,
+            "description": "Per-row edit revision; combine this resource id and version as X-Expected-Version: id:version."
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "role",
+          "licenseNo",
+          "experienceYears",
+          "contactNo",
+          "active",
+          "version"
+        ]
+      },
+      "AircraftView": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 1
+          },
+          "registration": {
+            "type": "string"
+          },
+          "aircraftTypeId": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 1
+          },
+          "model": {
+            "type": "string"
+          },
+          "active": {
+            "type": "boolean"
+          },
+          "version": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0,
+            "description": "Per-row edit revision; combine this resource id and version as X-Expected-Version: id:version."
+          }
+        },
+        "required": [
+          "id",
+          "registration",
+          "aircraftTypeId",
+          "model",
+          "active",
+          "version"
+        ]
+      },
+      "AirportView": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 1
+          },
+          "iataCode": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "city": {
+            "type": "string"
+          },
+          "country": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "iataCode",
+          "name",
+          "city",
+          "country"
+        ]
+      },
+      "AircraftTypeView": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 1
+          },
+          "model": {
+            "type": "string"
+          },
+          "manufacturer": {
+            "type": "string"
+          },
+          "capacity": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "minCabinCrew": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "required": [
+          "id",
+          "model",
+          "manufacturer",
+          "capacity",
+          "minCabinCrew"
+        ]
+      },
+      "QualificationView": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 1
+          },
+          "aircraftTypeId": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 1
+          },
+          "model": {
+            "type": "string"
+          },
+          "requiredRole": {
+            "$ref": "#/components/schemas/CrewRole"
+          }
+        },
+        "required": [
+          "id",
+          "aircraftTypeId",
+          "model",
+          "requiredRole"
+        ]
+      },
+      "CrewQualificationView": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 1
+          },
+          "crewId": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 1
+          },
+          "qualificationId": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 1
+          },
+          "aircraftTypeId": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 1
+          },
+          "model": {
+            "type": "string"
+          },
+          "requiredRole": {
+            "$ref": "#/components/schemas/CrewRole"
+          },
+          "validUntil": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "version": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0,
+            "description": "Per-row edit revision; combine this resource id and version as X-Expected-Version: id:version."
+          }
+        },
+        "required": [
+          "id",
+          "crewId",
+          "qualificationId",
+          "aircraftTypeId",
+          "model",
+          "requiredRole",
+          "validUntil",
+          "version"
+        ]
+      },
+      "FlightView": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 1
+          },
+          "flightNumber": {
+            "type": "string"
+          },
+          "sourceAirportId": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 1
+          },
+          "sourceIataCode": {
+            "type": "string"
+          },
+          "destinationAirportId": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 1
+          },
+          "destinationIataCode": {
+            "type": "string"
+          },
+          "aircraftId": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 1
+          },
+          "aircraftRegistration": {
+            "type": "string"
+          },
+          "aircraftTypeId": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 1
+          },
+          "departureTime": {
+            "type": "string",
+            "format": "date-time",
+            "description": "ISO-8601 timestamp with Z or explicit offset on input. Responses normalize to UTC Z."
+          },
+          "arrivalTime": {
+            "type": "string",
+            "format": "date-time",
+            "description": "ISO-8601 timestamp with Z or explicit offset on input. Responses normalize to UTC Z."
+          },
+          "status": {
+            "$ref": "#/components/schemas/FlightStatus"
+          },
+          "version": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0,
+            "description": "Per-row edit revision; combine this resource id and version as X-Expected-Version: id:version."
+          }
+        },
+        "required": [
+          "id",
+          "flightNumber",
+          "sourceAirportId",
+          "sourceIataCode",
+          "destinationAirportId",
+          "destinationIataCode",
+          "aircraftId",
+          "aircraftRegistration",
+          "aircraftTypeId",
+          "departureTime",
+          "arrivalTime",
+          "status",
+          "version"
+        ]
+      },
+      "AssignmentView": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 1
+          },
+          "crewId": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 1
+          },
+          "flightId": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 1
+          },
+          "flightNumber": {
+            "type": "string"
+          },
+          "assignedRole": {
+            "$ref": "#/components/schemas/CrewRole"
+          },
+          "dutyStartTime": {
+            "type": "string",
+            "format": "date-time",
+            "description": "ISO-8601 timestamp with Z or explicit offset on input. Responses normalize to UTC Z."
+          },
+          "dutyEndTime": {
+            "type": "string",
+            "format": "date-time",
+            "description": "ISO-8601 timestamp with Z or explicit offset on input. Responses normalize to UTC Z."
+          },
+          "status": {
+            "$ref": "#/components/schemas/AssignmentStatus"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "ISO-8601 timestamp with Z or explicit offset on input. Responses normalize to UTC Z."
+          },
+          "version": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0,
+            "description": "Per-row edit revision; combine this resource id and version as X-Expected-Version: id:version."
+          }
+        },
+        "required": [
+          "id",
+          "crewId",
+          "flightId",
+          "flightNumber",
+          "assignedRole",
+          "dutyStartTime",
+          "dutyEndTime",
+          "status",
+          "createdAt",
+          "version"
+        ]
+      },
+      "UnavailabilityView": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 1
+          },
+          "crewId": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 1
+          },
+          "startTime": {
+            "type": "string",
+            "format": "date-time",
+            "description": "ISO-8601 timestamp with Z or explicit offset on input. Responses normalize to UTC Z."
+          },
+          "endTime": {
+            "type": "string",
+            "format": "date-time",
+            "description": "ISO-8601 timestamp with Z or explicit offset on input. Responses normalize to UTC Z."
+          },
+          "reason": {
+            "type": "string"
+          },
+          "version": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0,
+            "description": "Per-row edit revision; combine this resource id and version as X-Expected-Version: id:version."
+          }
+        },
+        "required": [
+          "id",
+          "crewId",
+          "startTime",
+          "endTime",
+          "reason",
+          "version"
+        ]
+      },
+      "UnavailabilityConflictView": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "conflicts": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "conflicts"
+        ]
+      },
+      "DutyWindow": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "start": {
+            "type": "string",
+            "format": "date-time",
+            "description": "ISO-8601 timestamp with Z or explicit offset on input. Responses normalize to UTC Z."
+          },
+          "end": {
+            "type": "string",
+            "format": "date-time",
+            "description": "ISO-8601 timestamp with Z or explicit offset on input. Responses normalize to UTC Z."
+          }
+        },
+        "required": [
+          "start",
+          "end"
+        ]
+      },
+      "DutyLoad": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "maximumRolling24Hours": {
+            "type": "string",
+            "format": "duration"
+          },
+          "maximumRolling7Days": {
+            "type": "string",
+            "format": "duration"
+          },
+          "maximumUtcDay": {
+            "type": "string",
+            "format": "duration"
+          }
+        },
+        "required": [
+          "maximumRolling24Hours",
+          "maximumRolling7Days",
+          "maximumUtcDay"
+        ]
+      },
+      "SchedulingPolicy": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "preflightBuffer": {
+            "type": "string",
+            "format": "duration"
+          },
+          "postflightBuffer": {
+            "type": "string",
+            "format": "duration"
+          },
+          "minimumRest": {
+            "type": "string",
+            "format": "duration"
+          },
+          "maximumRolling24Hours": {
+            "type": "string",
+            "format": "duration"
+          },
+          "maximumRolling7Days": {
+            "type": "string",
+            "format": "duration"
+          },
+          "maximumUtcDay": {
+            "type": "string",
+            "format": "duration"
+          }
+        },
+        "required": [
+          "preflightBuffer",
+          "postflightBuffer",
+          "minimumRest",
+          "maximumRolling24Hours",
+          "maximumRolling7Days",
+          "maximumUtcDay"
+        ]
+      },
+      "SchedulingReason": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "code": {
+            "$ref": "#/components/schemas/SchedulingReasonCode"
+          },
+          "explanation": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "explanation"
+        ]
+      },
+      "EligibilityDecision": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "eligible": {
+            "type": "boolean"
+          },
+          "dutyWindow": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/DutyWindow"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "dutyLoad": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/DutyLoad"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "reasons": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SchedulingReason"
+            }
+          },
+          "policy": {
+            "$ref": "#/components/schemas/SchedulingPolicy"
+          },
+          "policyNotice": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "eligible",
+          "dutyWindow",
+          "dutyLoad",
+          "reasons",
+          "policy",
+          "policyNotice"
+        ]
+      },
+      "RoleCoverage": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "role": {
+            "$ref": "#/components/schemas/CrewRole"
+          },
+          "required": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "active": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "missing": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "required": [
+          "role",
+          "required",
+          "active",
+          "missing"
+        ]
+      },
+      "FlightCrewCoverage": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "flightId": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 1
+          },
+          "flightStatus": {
+            "$ref": "#/components/schemas/FlightStatus"
+          },
+          "roles": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RoleCoverage"
+            }
+          },
+          "minimumStaffingSatisfied": {
+            "type": "boolean"
+          },
+          "reasons": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SchedulingReason"
+            }
+          },
+          "policyNotice": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "flightId",
+          "flightStatus",
+          "roles",
+          "minimumStaffingSatisfied",
+          "reasons",
+          "policyNotice"
+        ]
+      },
+      "ApiFieldError": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "field": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "field",
+          "message"
+        ]
+      },
+      "ApiError": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "code": {
+            "type": "string",
+            "enum": [
+              "VALIDATION_ERROR",
+              "INVALID_PARAMETER",
+              "MALFORMED_JSON",
+              "NOT_FOUND",
+              "DUPLICATE_RESOURCE",
+              "BUSINESS_CONFLICT",
+              "ASSIGNMENT_REJECTED",
+              "DOMAIN_CONFLICT",
+              "METHOD_NOT_ALLOWED",
+              "UNSUPPORTED_MEDIA_TYPE",
+              "NOT_ACCEPTABLE",
+              "ORIGIN_NOT_ALLOWED",
+              "HOST_NOT_ALLOWED",
+              "INTERNAL_ERROR",
+              "STALE_VERSION",
+              "PRECONDITION_REQUIRED"
+            ]
+          },
+          "message": {
+            "type": "string"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "ISO-8601 timestamp with Z or explicit offset on input. Responses normalize to UTC Z."
+          },
+          "path": {
+            "type": "string"
+          },
+          "fieldErrors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ApiFieldError"
+            }
+          },
+          "eligibility": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/EligibilityDecision"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "code",
+          "message",
+          "timestamp",
+          "path",
+          "fieldErrors",
+          "eligibility"
+        ]
+      },
+      "PageResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "page": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "size": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 1,
+            "maximum": 200
+          },
+          "totalElements": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
+          },
+          "totalPages": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "first": {
+            "type": "boolean"
+          },
+          "last": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "items",
+          "page",
+          "size",
+          "totalElements",
+          "totalPages",
+          "first",
+          "last"
+        ]
+      },
+      "CrewPage": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CrewView"
+            }
+          },
+          "page": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "size": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 1,
+            "maximum": 200
+          },
+          "totalElements": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
+          },
+          "totalPages": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "first": {
+            "type": "boolean"
+          },
+          "last": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "items",
+          "page",
+          "size",
+          "totalElements",
+          "totalPages",
+          "first",
+          "last"
+        ]
+      },
+      "AircraftPage": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AircraftView"
+            }
+          },
+          "page": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "size": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 1,
+            "maximum": 200
+          },
+          "totalElements": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
+          },
+          "totalPages": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "first": {
+            "type": "boolean"
+          },
+          "last": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "items",
+          "page",
+          "size",
+          "totalElements",
+          "totalPages",
+          "first",
+          "last"
+        ]
+      },
+      "FlightPage": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FlightView"
+            }
+          },
+          "page": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "size": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 1,
+            "maximum": 200
+          },
+          "totalElements": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
+          },
+          "totalPages": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "first": {
+            "type": "boolean"
+          },
+          "last": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "items",
+          "page",
+          "size",
+          "totalElements",
+          "totalPages",
+          "first",
+          "last"
+        ]
+      },
+      "AssignmentPage": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AssignmentView"
+            }
+          },
+          "page": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "size": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 1,
+            "maximum": 200
+          },
+          "totalElements": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
+          },
+          "totalPages": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "first": {
+            "type": "boolean"
+          },
+          "last": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "items",
+          "page",
+          "size",
+          "totalElements",
+          "totalPages",
+          "first",
+          "last"
+        ]
+      },
+      "UnavailabilityPage": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UnavailabilityView"
+            }
+          },
+          "page": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "size": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 1,
+            "maximum": 200
+          },
+          "totalElements": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
+          },
+          "totalPages": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "first": {
+            "type": "boolean"
+          },
+          "last": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "items",
+          "page",
+          "size",
+          "totalElements",
+          "totalPages",
+          "first",
+          "last"
+        ]
+      }
+    },
+    "responses": {
+      "Api400": {
+        "description": "Invalid request",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ApiError"
+            }
+          }
+        }
+      },
+      "Api403": {
+        "description": "Non-loopback hostname or cross-origin request rejected",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ApiError"
+            }
+          }
+        }
+      },
+      "Api404": {
+        "description": "Missing resource",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ApiError"
+            }
+          }
+        }
+      },
+      "Api409": {
+        "description": "Duplicate or business conflict; assignment rejection includes eligibility; STALE_VERSION requires reloading and reviewing the edit",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ApiError"
+            }
+          }
+        }
+      },
+      "Api500": {
+        "description": "Internal failure with sanitized message",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ApiError"
+            }
+          }
+        }
+      },
+      "Api428": {
+        "description": "Original edit snapshot required in X-Expected-Version header",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ApiError"
+            }
+          }
+        }
+      }
+    }
+  }
+}

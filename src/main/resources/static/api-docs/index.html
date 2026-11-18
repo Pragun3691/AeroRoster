@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>AeroRoster API documentation</title>
+  <link rel="stylesheet" href="../css/app.css">
+  <style>
+    main { max-width: 1100px; margin: 2rem auto; padding: 0 1rem; }
+    input { width: 100%; box-sizing: border-box; padding: .8rem; margin: 1rem 0; }
+    details { padding: .8rem; border-bottom: 1px solid #cad2de; }
+    summary { cursor: pointer; overflow-wrap: anywhere; }
+    pre { overflow: auto; padding: 1rem; background: #f1f4f8; color: #17202e; }
+    a { color: #1451a4; }
+  </style>
+  <script src="docs.js" defer></script>
+</head>
+<body>
+<main>
+  <h1>AeroRoster API</h1>
+  <p>Local development only. Authentication and authorization are absent. Do not publicly deploy this API as a production-ready service.</p>
+  <p>Base path <code>/api/v1</code>. Scheduling limits are illustrative academic rules.</p>
+  <a href="../api/v1/openapi.json">Download OpenAPI specification</a>
+  <label for="filter">Find an endpoint</label>
+  <input id="filter" type="search" placeholder="Method, resource or path">
+  <div id="operations" aria-live="polite">Loading API documentation…</div>
+  <details><summary>JSON schemas</summary><pre id="schemas"></pre></details>
+</main>
+</body>
+</html>

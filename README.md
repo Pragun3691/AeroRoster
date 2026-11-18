@@ -1,6 +1,6 @@
 # AeroRoster — Airline Crew Management & Duty Scheduling
 
-**Status:** Phase 1 starter, NOT the finished application. The original Oracle Live SQL archive stays unchanged.
+Phase 2.5 is committed at `48237bf`. Phase 2.6 adds version-checked edits and freezes OpenAPI 1.1.0 for the existing 42 `/api/v1` operations. This unauthenticated API is for local development only and must not be publicly deployed. Start with the [three-member setup and handoff guide](docs/11_PHASE26_TEAM_HANDOFF.md), then the [REST contracts](docs/09_PHASE24_REST_API.md).
 
 Source DBMS project: https://github.com/Pragun3691/airline-crew-dbms
 
@@ -17,7 +17,7 @@ Create a Java-based airline operations application for managing airports, aircra
 
 ## Setup on Windows PowerShell
 
-1. Install Java 21 (JDK), Maven 3.9+, PostgreSQL 16+.
+1. Install Java 21 (JDK), Maven 3.9+, PostgreSQL 17. The verified Maven version is 3.10.1.
 2. Create **a separate new** database, not the previous DBMS database:
    ```sql
    CREATE DATABASE aeroroster_dev;
@@ -39,7 +39,8 @@ Create a Java-based airline operations application for managing airports, aircra
    ```powershell
    mvn spring-boot:run
    ```
-   Flyway should apply `V1` and `V2` on startup. Go to `http://localhost:8080`.
+   Flyway applies `V1`, `V2` and `V3` on startup (or validates migrations already applied). V3 adds edit versions without resetting data. Stop older application builds before upgrading. Go to `http://localhost:8080`.
+   The default bind address is `127.0.0.1`. API documentation is available at `http://127.0.0.1:8080/api-docs/index.html`, with OpenAPI JSON at `/api/v1/openapi.json`. Use same-origin API calls.
 6. Confirm tables via psql:
    ```sql
    \c aeroroster_dev
@@ -53,7 +54,7 @@ Create a Java-based airline operations application for managing airports, aircra
    mvn test
    ```
 
-**Note:** This starter was generated and structurally checked, but Maven dependencies and PostgreSQL runtime could not be executed in the offline creation environment. Do not mark Phase 1 complete until you run the commands above.
+Phase 1 completion was reported by the project owner. PostgreSQL migration history and seed records were independently checked during Phase 2.1. Integration tests require the separate `aeroroster_test` database described in the [test instructions](docs/06_PHASE21_PERSISTENCE.md#test-setup).
 
 ## Repo layout
 
@@ -80,5 +81,8 @@ AeroRoster-Phase1/
 - Flight date-times stored as UTC-aware instants (`TIMESTAMPTZ`); UI can display selected local time zones.
 - All crew assignment validation belongs in Java services within a transaction. PostgreSQL constraints enforce primary keys, foreign keys, uniqueness and basic checks.
 - Do not deploy this initial local-only build publicly; authentication/authorization is not yet implemented.
+- API hostnames are restricted to localhost, 127.0.0.1 and IPv6 loopback; any Origin header must match the request origin. These checks do not authenticate clients. Duplicate JSON properties are rejected.
+- Existing-record edits, deletions, cancellations and reassignment require `X-Expected-Version: id:version` from the original resource snapshot. A stale token returns `409 STALE_VERSION`; a missing token returns `428 PRECONDITION_REQUIRED`. Reload and review before retrying; never replace the token silently.
+- Phase 2.5 verification, defects, evidence and team handoff limitations: [backend verification](docs/10_PHASE25_BACKEND_VERIFICATION.md).
 - SQL migrations belong to Flyway; do not enable Hibernate schema generation.
 - Preserve original Oracle archive; this project is a separate codebase.
