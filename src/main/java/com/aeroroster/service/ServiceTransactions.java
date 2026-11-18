@@ -3,11 +3,13 @@ package com.aeroroster.service;
 import com.aeroroster.service.exception.BusinessConflictException;
 import com.aeroroster.service.exception.DuplicateResourceException;
 import com.aeroroster.service.exception.PersistenceFailureException;
+import com.aeroroster.service.exception.StaleVersionException;
 import java.sql.SQLException;
 import java.util.function.Supplier;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.PessimisticLockingFailureException;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.TransactionException;
 
@@ -36,6 +38,8 @@ public class ServiceTransactions {
                 throw new DuplicateResourceException("A record with these unique identifiers already exists", exception);
             }
             throw new BusinessConflictException("The operation conflicts with existing records or database constraints", exception);
+        } catch (OptimisticLockingFailureException | jakarta.persistence.OptimisticLockException exception) {
+            throw new StaleVersionException();
         } catch (PessimisticLockingFailureException exception) {
             throw new BusinessConflictException("A concurrent change prevented this operation. Retry the complete operation", exception);
         } catch (DataAccessException | TransactionException exception) {

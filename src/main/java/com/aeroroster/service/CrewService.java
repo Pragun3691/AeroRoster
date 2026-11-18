@@ -66,10 +66,15 @@ public class CrewService {
     }
 
     public CrewView update(Long id, CrewRequest request) {
+        return update(id, request, null);
+    }
+
+    public CrewView update(Long id, CrewRequest request, ExpectedVersion expected) {
         validation.id(id);
         validation.request(request);
         return transactions.write(() -> {
             Crew member = locks.crew(id);
+            ExpectedVersion.check(expected, member.getId(), member.getVersion());
             if (member.getRole() != request.role()
                     && (!qualifications.findByCrewId(id).isEmpty() || assignments.existsByCrewId(id))) {
                 throw new BusinessConflictException("Crew role cannot change while qualifications or assignment history exist");
@@ -82,9 +87,14 @@ public class CrewService {
     }
 
     public CrewView setActive(Long id, boolean active) {
+        return setActive(id, active, null);
+    }
+
+    public CrewView setActive(Long id, boolean active, ExpectedVersion expected) {
         validation.id(id);
         return transactions.write(() -> {
             Crew member = locks.crew(id);
+            ExpectedVersion.check(expected, member.getId(), member.getVersion());
             if (!active && assignments.existsByCrewIdAndStatusAndDutyEndTimeAfter(
                     id, AssignmentStatus.ACTIVE, clock.instant())) {
                 throw new BusinessConflictException("Crew member has ongoing or future active duties. Resolve them before deactivation");

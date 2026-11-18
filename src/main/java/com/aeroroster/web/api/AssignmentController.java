@@ -36,14 +36,16 @@ public class AssignmentController {
     }
 
     @PutMapping("/{assignmentId}/cancellation")
-    public AssignmentView cancel(@PathVariable @Positive Long assignmentId, @RequestBody(required = false) EmptyRequest ignored) {
-        return duties.cancel(assignmentId);
+    public AssignmentView cancel(@PathVariable @Positive Long assignmentId, @RequestBody(required = false) EmptyRequest ignored,
+            @RequestHeader(name = ApiPreconditions.HEADER, required = false) String expectedVersion) {
+        return duties.cancel(assignmentId, ApiPreconditions.require(expectedVersion));
     }
 
     @PostMapping("/{assignmentId}/reassignments")
     public ResponseEntity<AssignmentView> reassign(@PathVariable @Positive Long assignmentId,
-            @RequestBody(required = false) EmptyRequest ignored) {
-        AssignmentView result = duties.reassign(assignmentId);
+            @RequestBody(required = false) EmptyRequest ignored,
+            @RequestHeader(name = ApiPreconditions.HEADER, required = false) String expectedVersion) {
+        AssignmentView result = duties.reassign(assignmentId, ApiPreconditions.require(expectedVersion));
         return ResponseEntity.created(URI.create("/api/v1/assignments/" + result.id())).body(result);
     }
 }

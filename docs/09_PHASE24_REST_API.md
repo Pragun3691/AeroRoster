@@ -1,5 +1,7 @@
 # Phase 2.4 REST API
 
+Current contract baseline: **OpenAPI 1.1.0, frozen in Phase 2.6**. The original 42 paths/methods remain. Six mutable resource DTOs now include server-managed int64 version. All PUT/PATCH/DELETE operations and POST assignment reassignments require `X-Expected-Version: id:version` from the original edit snapshot. Missing headers return 428 PRECONDITION_REQUIRED; changed versions or row identity return 409 STALE_VERSION; malformed tokens return 400 INVALID_PARAMETER. For qualification expiry/revocation use the held-link resource id, not its qualificationId. Bodies retain the editable fields below; do not copy version into them. See [conditional operation details and team setup](11_PHASE26_TEAM_HANDOFF.md). Earlier execution counts in this document are historical Phase 2.4 evidence.
+
 ## Inspection and implementation plan
 
 Phases 2.1, 2.2 and 2.3 are committed at c4b65d4, 0c8f897 and 4bfe6c2. The working tree was clean before this milestone. Inspection covered the project rules, docs 01–08, existing service/DTO/exception contracts, persistence mappings and queries, migrations and tests.
@@ -155,6 +157,8 @@ Handled API failures return application/json with the same record shape. Timesta
 | 409 | BUSINESS_CONFLICT | State, scheduling or history prevents an operation |
 | 409 | ASSIGNMENT_REJECTED | Current scheduling rules rejected assignment; eligibility contains all practical reasons |
 | 409 | DOMAIN_CONFLICT | Fallback for another typed domain failure |
+| 409 | STALE_VERSION | Original resource identity/version changed; reload and review the edit |
+| 428 | PRECONDITION_REQUIRED | Send X-Expected-Version from the original resource snapshot |
 | 405 | METHOD_NOT_ALLOWED | Method unsupported; Allow lists supported methods |
 | 406 | NOT_ACCEPTABLE | API output is application/json |
 | 415 | UNSUPPORTED_MEDIA_TYPE | Use application/json for the body |
@@ -188,10 +192,10 @@ Accept: application/json
 ```
 
 ```json
-{"id":101,"name":"Demo Pilot","role":"PILOT","licenseNo":"TEAM-P-001","experienceYears":4,"contactNo":"9000000000","active":true}
+{"id":101,"name":"Demo Pilot","role":"PILOT","licenseNo":"TEAM-P-001","experienceYears":4,"contactNo":"9000000000","active":true,"version":0}
 ```
 
-IDs in examples are illustrative. Use returned IDs and the reference endpoints for actual requests. Update editable fields with PUT /crew/{crewId}, and change activity separately with PATCH /crew/{crewId}/activity using `{"active":false}`.
+IDs in examples are illustrative. Use returned IDs and the reference endpoints for actual requests. Update editable fields with PUT /crew/{crewId}, and change activity separately with PATCH /crew/{crewId}/activity using `{"active":false}`. Both require the original resource token, e.g. `X-Expected-Version: 101:0`; retain the returned version for subsequent reviewed edits.
 
 ```javascript
 async function loadCrew(page = 0) {
@@ -208,7 +212,7 @@ async function loadCrew(page = 0) {
 }
 ```
 
-For writes, JSON.stringify the documented request object and set Content-Type application/json. A 204 response has no JSON body. Keep path/query IDs separate from editable form fields. Same-origin fetch requires no CORS configuration.
+For writes, JSON.stringify the documented request object and set Content-Type application/json. Include X-Expected-Version for the 13 conditional operations; on STALE_VERSION reload and review rather than refreshing the token silently. A 204 response has no JSON body. Keep path/query IDs and version separate from editable form fields. Same-origin fetch requires no CORS configuration.
 
 ## Eligibility and coverage for Member 3
 
@@ -227,7 +231,7 @@ The response is EligibilityDecision with eligible, dutyWindow, dutyLoad, reasons
 
 Use the same request with POST /api/v1/assignments after user confirmation. Handle 409 ASSIGNMENT_REJECTED by displaying error.eligibility.reasons from that write. GET /flights/{flightId}/coverage returns required/active/missing counts for each role and minimumStaffingSatisfied. Eligibility and coverage support the future candidate workflow, while allocation/ranking remains a later milestone.
 
-Cancel an assignment with PUT /assignments/{assignmentId}/cancellation. POST /assignments/{assignmentId}/reassignments creates a fresh row from cancelled history. Query activeOnly=false on flight assignments to inspect retained rows. Cancel active assignments before requesting flight cancellation. A competing assignment can still make that cancellation reject safely.
+Cancel an assignment with PUT /assignments/{assignmentId}/cancellation using its original id:version header. POST /assignments/{assignmentId}/reassignments requires the cancelled source's current token and creates a fresh row from cancelled history. Query activeOnly=false on flight assignments to inspect retained rows. Cancel active assignments before requesting flight cancellation with the flight's own original token. A competing assignment can still make that cancellation reject safely.
 
 ## Development workflow and database safety
 

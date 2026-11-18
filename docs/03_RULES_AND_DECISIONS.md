@@ -53,3 +53,9 @@ The unauthenticated API binds to loopback by default and enforces a same-origin 
 ## Phase 2.5 verification decisions
 
 The independent regression review retains the existing architecture, schema, lock order and illustrative limits. API hostnames are additionally restricted to localhost and numeric loopback to prevent foreign-host same-origin bypasses. Duplicate JSON fields fail binding rather than silently selecting a value. Integrated HTTP, migration, concurrency and packaged-runtime evidence and remaining team integration limits are recorded in `10_PHASE25_BACKEND_VERIFICATION.md`.
+
+## Phase 2.6 concurrency and API freeze
+
+The owner explicitly authorized optimistic concurrency and additive version columns in the Phase 2.6 request after the Phase 2.5 checkpoint. V3 adds nonnegative BIGINT revisions to crew, aircraft, flight, held qualifications, unavailability and duty assignments, mapped with JPA @Version. Resource DTOs expose version. Thirteen existing-record mutations require X-Expected-Version: id:version; services compare after acquiring/refreshing existing locks. Identity protects recreated child links; stale edits return 409 STALE_VERSION and missing preconditions return 428 PRECONDITION_REQUIRED. Trusted internal current-state command overloads remain; client edits must use the conditional overloads. Scheduling safety checks and READ_COMMITTED lock order remain mandatory.
+
+OpenAPI 1.1.0 freezes the 42 operation contracts with an LF-normalized checksum guard. Request bodies retain their editable fields; version is server-managed and travels in the conditional header. Team setup, branch/PR workflow, future API gaps and acceptance evidence are in `11_PHASE26_TEAM_HANDOFF.md`. No authentication, allocation, calendar or report features are added.

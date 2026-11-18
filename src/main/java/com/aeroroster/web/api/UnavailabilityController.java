@@ -39,13 +39,15 @@ public class UnavailabilityController {
 
     @PutMapping(value = "/{periodId}", consumes = MediaType.APPLICATION_JSON_VALUE)
     public UnavailabilityView update(@PathVariable @Positive Long crewId, @PathVariable @Positive Long periodId,
-            @Valid @RequestBody UnavailabilityRequest request) {
-        return unavailable.update(crewId, periodId, request);
+            @Valid @RequestBody UnavailabilityRequest request,
+            @RequestHeader(name = ApiPreconditions.HEADER, required = false) String expectedVersion) {
+        return unavailable.update(crewId, periodId, request, ApiPreconditions.require(expectedVersion));
     }
 
     @DeleteMapping("/{periodId}")
-    public ResponseEntity<Void> remove(@PathVariable @Positive Long crewId, @PathVariable @Positive Long periodId) {
-        unavailable.remove(crewId, periodId);
+    public ResponseEntity<Void> remove(@PathVariable @Positive Long crewId, @PathVariable @Positive Long periodId,
+            @RequestHeader(name = ApiPreconditions.HEADER, required = false) String expectedVersion) {
+        unavailable.remove(crewId, periodId, ApiPreconditions.require(expectedVersion));
         return ResponseEntity.noContent().build();
     }
 

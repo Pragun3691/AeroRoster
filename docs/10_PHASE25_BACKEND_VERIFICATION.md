@@ -1,5 +1,7 @@
 # Phase 2.5 backend integration and reliability verification
 
+Historical Phase 2.5 evidence. The owner subsequently authorized Phase 2.6 versioned edits and the team handoff. Current contracts, migration V3 and closure of the stale administrative edit limitation are documented in [the Phase 2.6 handoff](11_PHASE26_TEAM_HANDOFF.md).
+
 ## Checkpoint and risk-based plan
 
 The audit began on feature/phase2-core at commit 87439d2 with a clean working tree. Phases 2.1 through 2.4 are committed. Review the actual migrations, entities, repositories, services, DTOs, controllers, exception/JSON/origin handling, scheduling calculations, OpenAPI and tests before changing production behavior.

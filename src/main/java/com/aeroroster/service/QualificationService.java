@@ -82,12 +82,17 @@ public class QualificationService {
     }
 
     public CrewQualificationView updateExpiry(Long crewId, Long qualificationId, QualificationExpiryRequest request) {
+        return updateExpiry(crewId, qualificationId, request, null);
+    }
+
+    public CrewQualificationView updateExpiry(Long crewId, Long qualificationId, QualificationExpiryRequest request, ExpectedVersion expected) {
         validation.id(crewId);
         validation.id(qualificationId);
         validation.request(request);
         return transactions.write(() -> {
             Crew member = locks.crew(crewId);
             CrewQualification held = locks.qualification(crewId, qualificationId);
+            ExpectedVersion.check(expected, held.getId(), held.getVersion());
             checkRole(member, held.getQualification());
             LocalDate expiry = request.validUntil();
             if (expiry != null && (held.getValidUntil() == null || expiry.isBefore(held.getValidUntil()))) {
@@ -104,11 +109,16 @@ public class QualificationService {
     }
 
     public void revoke(Long crewId, Long qualificationId) {
+        revoke(crewId, qualificationId, null);
+    }
+
+    public void revoke(Long crewId, Long qualificationId, ExpectedVersion expected) {
         validation.id(crewId);
         validation.id(qualificationId);
         transactions.write(() -> {
             locks.crew(crewId);
             CrewQualification held = locks.qualification(crewId, qualificationId);
+            ExpectedVersion.check(expected, held.getId(), held.getVersion());
             if (!history(held).isEmpty()) {
                 throw new BusinessConflictException("Qualification has assignment history and must be retained");
             }

@@ -48,7 +48,7 @@ class PersistenceIntegrationTest {
 
     @Test
     void migrationsAndSeedMapAllTenTables() {
-        assertEquals(2, jdbc.queryForObject(
+        assertEquals(3, jdbc.queryForObject(
                 "select count(*) from flyway_schema_history where success", Integer.class));
         assertEquals(5, airports.count());
         assertEquals(2, aircraftTypes.count());

@@ -10,6 +10,14 @@ public class Flight {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Version
+    @Column(name = "version", nullable = false)
+    private long version;
+
+    public long getVersion() {
+        return version;
+    }
+
     @Column(name = "flight_number", nullable = false, length = 15)
     private String flightNumber;
 

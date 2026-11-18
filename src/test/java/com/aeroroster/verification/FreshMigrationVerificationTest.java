@@ -41,13 +41,16 @@ class FreshMigrationVerificationTest {
                 connection.setSchema(schema);
                 Flyway flyway = Flyway.configure().dataSource(scoped).defaultSchema(schema).schemas(schema)
                         .createSchemas(false).load();
-                assertEquals(2, flyway.migrate().migrationsExecuted);
+                assertEquals(3, flyway.migrate().migrationsExecuted);
                 flyway.validate();
                 connection.setSchema(schema);
-                assertEquals(List.of("1", "2"), sql.queryForList(
+                assertEquals(List.of("1", "2", "3"), sql.queryForList(
                         "select version from flyway_schema_history where success and version is not null order by installed_rank", String.class));
                 SEEDS.forEach((table, count) -> assertEquals(count,
                         sql.queryForObject("select count(*) from " + table, Integer.class), table));
+                for (String table : List.of("crew", "aircraft", "flight", "crew_qualification", "crew_unavailability", "duty_assignment")) {
+                    assertEquals(0, sql.queryForObject("select count(*) from " + table + " where version<>0", Integer.class), table);
+                }
                 assertEquals(10, sql.queryForObject("select count(*) from information_schema.table_constraints where constraint_schema=? and constraint_type='FOREIGN KEY'", Integer.class, schema));
                 assertThrows(org.springframework.dao.DataIntegrityViolationException.class,
                         () -> sql.update("insert into crew_qualification(crew_id,qualification_id) values (?,?)", Long.MAX_VALUE, Long.MAX_VALUE));

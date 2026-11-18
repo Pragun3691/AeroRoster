@@ -39,13 +39,15 @@ public class QualificationController {
 
     @PutMapping(value = "/{qualificationId}/expiry", consumes = MediaType.APPLICATION_JSON_VALUE)
     public CrewQualificationView expiry(@PathVariable @Positive Long crewId, @PathVariable @Positive Long qualificationId,
-            @Valid @RequestBody ExpiryUpdateRequest request) {
-        return qualifications.updateExpiry(crewId, qualificationId, new QualificationExpiryRequest(request.validUntil()));
+            @Valid @RequestBody ExpiryUpdateRequest request,
+            @RequestHeader(name = ApiPreconditions.HEADER, required = false) String expectedVersion) {
+        return qualifications.updateExpiry(crewId, qualificationId, new QualificationExpiryRequest(request.validUntil()), ApiPreconditions.require(expectedVersion));
     }
 
     @DeleteMapping("/{qualificationId}")
-    public ResponseEntity<Void> revoke(@PathVariable @Positive Long crewId, @PathVariable @Positive Long qualificationId) {
-        qualifications.revoke(crewId, qualificationId);
+    public ResponseEntity<Void> revoke(@PathVariable @Positive Long crewId, @PathVariable @Positive Long qualificationId,
+            @RequestHeader(name = ApiPreconditions.HEADER, required = false) String expectedVersion) {
+        qualifications.revoke(crewId, qualificationId, ApiPreconditions.require(expectedVersion));
         return ResponseEntity.noContent().build();
     }
 }

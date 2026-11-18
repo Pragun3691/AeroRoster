@@ -2,8 +2,8 @@
   "openapi": "3.1.0",
   "info": {
     "title": "AeroRoster local development API",
-    "version": "1.0.0",
-    "description": "Unauthenticated local development only. API host must be localhost, 127.0.0.1 or IPv6 loopback; Origin, when present, must match scheme, host and port. Duplicate JSON properties are rejected. Do not publicly deploy as a production-ready service. All scheduling limits are illustrative academic settings. Eligibility never reserves a slot."
+    "version": "1.1.0",
+    "description": "Unauthenticated local development only. API host must be localhost, 127.0.0.1 or IPv6 loopback; Origin, when present, must match scheme, host and port. Duplicate JSON properties are rejected. Do not publicly deploy as a production-ready service. All scheduling limits are illustrative academic settings. Eligibility never reserves a slot. Phase 2.6 frozen baseline: mutable resources expose version; existing-record changes require X-Expected-Version: id:version from the original edit snapshot (428 missing, 409 STALE_VERSION changed)."
   },
   "servers": [
     {
@@ -217,6 +217,18 @@
               "format": "int64",
               "minimum": 1
             }
+          },
+          {
+            "name": "X-Expected-Version",
+            "in": "header",
+            "required": true,
+            "description": "Original target resource id:version. For qualification expiry/revocation use CrewQualificationView.id (held-link id), not qualificationId. Do not fetch a new token just to retry stale user input.",
+            "schema": {
+              "type": "string",
+              "pattern": "^[1-9][0-9]*:(0|[1-9][0-9]*)$",
+              "maxLength": 39
+            },
+            "example": "12:0"
           }
         ],
         "responses": {
@@ -244,6 +256,9 @@
           },
           "500": {
             "$ref": "#/components/responses/Api500"
+          },
+          "428": {
+            "$ref": "#/components/responses/Api428"
           }
         },
         "requestBody": {
@@ -275,6 +290,18 @@
               "format": "int64",
               "minimum": 1
             }
+          },
+          {
+            "name": "X-Expected-Version",
+            "in": "header",
+            "required": true,
+            "description": "Original target resource id:version. For qualification expiry/revocation use CrewQualificationView.id (held-link id), not qualificationId. Do not fetch a new token just to retry stale user input.",
+            "schema": {
+              "type": "string",
+              "pattern": "^[1-9][0-9]*:(0|[1-9][0-9]*)$",
+              "maxLength": 39
+            },
+            "example": "12:0"
           }
         ],
         "responses": {
@@ -302,6 +329,9 @@
           },
           "500": {
             "$ref": "#/components/responses/Api500"
+          },
+          "428": {
+            "$ref": "#/components/responses/Api428"
           }
         },
         "requestBody": {
@@ -882,6 +912,18 @@
               "format": "int64",
               "minimum": 1
             }
+          },
+          {
+            "name": "X-Expected-Version",
+            "in": "header",
+            "required": true,
+            "description": "Original target resource id:version. For qualification expiry/revocation use CrewQualificationView.id (held-link id), not qualificationId. Do not fetch a new token just to retry stale user input.",
+            "schema": {
+              "type": "string",
+              "pattern": "^[1-9][0-9]*:(0|[1-9][0-9]*)$",
+              "maxLength": 39
+            },
+            "example": "12:0"
           }
         ],
         "responses": {
@@ -909,6 +951,9 @@
           },
           "500": {
             "$ref": "#/components/responses/Api500"
+          },
+          "428": {
+            "$ref": "#/components/responses/Api428"
           }
         },
         "requestBody": {
@@ -940,6 +985,18 @@
               "format": "int64",
               "minimum": 1
             }
+          },
+          {
+            "name": "X-Expected-Version",
+            "in": "header",
+            "required": true,
+            "description": "Original target resource id:version. For qualification expiry/revocation use CrewQualificationView.id (held-link id), not qualificationId. Do not fetch a new token just to retry stale user input.",
+            "schema": {
+              "type": "string",
+              "pattern": "^[1-9][0-9]*:(0|[1-9][0-9]*)$",
+              "maxLength": 39
+            },
+            "example": "12:0"
           }
         ],
         "responses": {
@@ -967,6 +1024,9 @@
           },
           "500": {
             "$ref": "#/components/responses/Api500"
+          },
+          "428": {
+            "$ref": "#/components/responses/Api428"
           }
         },
         "requestBody": {
@@ -1253,6 +1313,18 @@
               "format": "int64",
               "minimum": 1
             }
+          },
+          {
+            "name": "X-Expected-Version",
+            "in": "header",
+            "required": true,
+            "description": "Original target resource id:version. For qualification expiry/revocation use CrewQualificationView.id (held-link id), not qualificationId. Do not fetch a new token just to retry stale user input.",
+            "schema": {
+              "type": "string",
+              "pattern": "^[1-9][0-9]*:(0|[1-9][0-9]*)$",
+              "maxLength": 39
+            },
+            "example": "12:0"
           }
         ],
         "responses": {
@@ -1273,6 +1345,9 @@
           },
           "500": {
             "$ref": "#/components/responses/Api500"
+          },
+          "428": {
+            "$ref": "#/components/responses/Api428"
           }
         }
       }
@@ -1304,6 +1379,18 @@
               "format": "int64",
               "minimum": 1
             }
+          },
+          {
+            "name": "X-Expected-Version",
+            "in": "header",
+            "required": true,
+            "description": "Original target resource id:version. For qualification expiry/revocation use CrewQualificationView.id (held-link id), not qualificationId. Do not fetch a new token just to retry stale user input.",
+            "schema": {
+              "type": "string",
+              "pattern": "^[1-9][0-9]*:(0|[1-9][0-9]*)$",
+              "maxLength": 39
+            },
+            "example": "12:0"
           }
         ],
         "responses": {
@@ -1331,6 +1418,9 @@
           },
           "500": {
             "$ref": "#/components/responses/Api500"
+          },
+          "428": {
+            "$ref": "#/components/responses/Api428"
           }
         },
         "description": "qualificationId identifies the requirement, not the held-link ID. validUntil must be present; null explicitly makes it open-ended.",
@@ -1574,6 +1664,18 @@
               "format": "int64",
               "minimum": 1
             }
+          },
+          {
+            "name": "X-Expected-Version",
+            "in": "header",
+            "required": true,
+            "description": "Original target resource id:version. For qualification expiry/revocation use CrewQualificationView.id (held-link id), not qualificationId. Do not fetch a new token just to retry stale user input.",
+            "schema": {
+              "type": "string",
+              "pattern": "^[1-9][0-9]*:(0|[1-9][0-9]*)$",
+              "maxLength": 39
+            },
+            "example": "12:0"
           }
         ],
         "responses": {
@@ -1601,6 +1703,9 @@
           },
           "500": {
             "$ref": "#/components/responses/Api500"
+          },
+          "428": {
+            "$ref": "#/components/responses/Api428"
           }
         },
         "requestBody": {
@@ -1632,6 +1737,18 @@
               "format": "int64",
               "minimum": 1
             }
+          },
+          {
+            "name": "X-Expected-Version",
+            "in": "header",
+            "required": true,
+            "description": "Original target resource id:version. For qualification expiry/revocation use CrewQualificationView.id (held-link id), not qualificationId. Do not fetch a new token just to retry stale user input.",
+            "schema": {
+              "type": "string",
+              "pattern": "^[1-9][0-9]*:(0|[1-9][0-9]*)$",
+              "maxLength": 39
+            },
+            "example": "12:0"
           }
         ],
         "responses": {
@@ -1659,6 +1776,9 @@
           },
           "500": {
             "$ref": "#/components/responses/Api500"
+          },
+          "428": {
+            "$ref": "#/components/responses/Api428"
           }
         },
         "requestBody": {
@@ -1690,6 +1810,18 @@
               "format": "int64",
               "minimum": 1
             }
+          },
+          {
+            "name": "X-Expected-Version",
+            "in": "header",
+            "required": true,
+            "description": "Original target resource id:version. For qualification expiry/revocation use CrewQualificationView.id (held-link id), not qualificationId. Do not fetch a new token just to retry stale user input.",
+            "schema": {
+              "type": "string",
+              "pattern": "^[1-9][0-9]*:(0|[1-9][0-9]*)$",
+              "maxLength": 39
+            },
+            "example": "12:0"
           }
         ],
         "responses": {
@@ -1717,6 +1849,9 @@
           },
           "500": {
             "$ref": "#/components/responses/Api500"
+          },
+          "428": {
+            "$ref": "#/components/responses/Api428"
           }
         },
         "requestBody": {
@@ -2030,6 +2165,18 @@
               "format": "int64",
               "minimum": 1
             }
+          },
+          {
+            "name": "X-Expected-Version",
+            "in": "header",
+            "required": true,
+            "description": "Original target resource id:version. For qualification expiry/revocation use CrewQualificationView.id (held-link id), not qualificationId. Do not fetch a new token just to retry stale user input.",
+            "schema": {
+              "type": "string",
+              "pattern": "^[1-9][0-9]*:(0|[1-9][0-9]*)$",
+              "maxLength": 39
+            },
+            "example": "12:0"
           }
         ],
         "responses": {
@@ -2057,6 +2204,9 @@
           },
           "500": {
             "$ref": "#/components/responses/Api500"
+          },
+          "428": {
+            "$ref": "#/components/responses/Api428"
           }
         },
         "requestBody": {
@@ -2088,6 +2238,18 @@
               "format": "int64",
               "minimum": 1
             }
+          },
+          {
+            "name": "X-Expected-Version",
+            "in": "header",
+            "required": true,
+            "description": "Original target resource id:version. For qualification expiry/revocation use CrewQualificationView.id (held-link id), not qualificationId. Do not fetch a new token just to retry stale user input.",
+            "schema": {
+              "type": "string",
+              "pattern": "^[1-9][0-9]*:(0|[1-9][0-9]*)$",
+              "maxLength": 39
+            },
+            "example": "12:0"
           }
         ],
         "responses": {
@@ -2124,6 +2286,9 @@
           },
           "500": {
             "$ref": "#/components/responses/Api500"
+          },
+          "428": {
+            "$ref": "#/components/responses/Api428"
           }
         },
         "requestBody": {
@@ -2359,6 +2524,18 @@
               "format": "int64",
               "minimum": 1
             }
+          },
+          {
+            "name": "X-Expected-Version",
+            "in": "header",
+            "required": true,
+            "description": "Original target resource id:version. For qualification expiry/revocation use CrewQualificationView.id (held-link id), not qualificationId. Do not fetch a new token just to retry stale user input.",
+            "schema": {
+              "type": "string",
+              "pattern": "^[1-9][0-9]*:(0|[1-9][0-9]*)$",
+              "maxLength": 39
+            },
+            "example": "12:0"
           }
         ],
         "responses": {
@@ -2386,6 +2563,9 @@
           },
           "500": {
             "$ref": "#/components/responses/Api500"
+          },
+          "428": {
+            "$ref": "#/components/responses/Api428"
           }
         },
         "requestBody": {
@@ -2425,6 +2605,18 @@
               "format": "int64",
               "minimum": 1
             }
+          },
+          {
+            "name": "X-Expected-Version",
+            "in": "header",
+            "required": true,
+            "description": "Original target resource id:version. For qualification expiry/revocation use CrewQualificationView.id (held-link id), not qualificationId. Do not fetch a new token just to retry stale user input.",
+            "schema": {
+              "type": "string",
+              "pattern": "^[1-9][0-9]*:(0|[1-9][0-9]*)$",
+              "maxLength": 39
+            },
+            "example": "12:0"
           }
         ],
         "responses": {
@@ -2445,6 +2637,9 @@
           },
           "500": {
             "$ref": "#/components/responses/Api500"
+          },
+          "428": {
+            "$ref": "#/components/responses/Api428"
           }
         }
       }
@@ -2823,6 +3018,12 @@
           },
           "active": {
             "type": "boolean"
+          },
+          "version": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0,
+            "description": "Per-row edit revision; combine this resource id and version as X-Expected-Version: id:version."
           }
         },
         "required": [
@@ -2832,7 +3033,8 @@
           "licenseNo",
           "experienceYears",
           "contactNo",
-          "active"
+          "active",
+          "version"
         ]
       },
       "AircraftView": {
@@ -2857,6 +3059,12 @@
           },
           "active": {
             "type": "boolean"
+          },
+          "version": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0,
+            "description": "Per-row edit revision; combine this resource id and version as X-Expected-Version: id:version."
           }
         },
         "required": [
@@ -2864,7 +3072,8 @@
           "registration",
           "aircraftTypeId",
           "model",
-          "active"
+          "active",
+          "version"
         ]
       },
       "AirportView": {
@@ -2997,6 +3206,12 @@
                 "type": "null"
               }
             ]
+          },
+          "version": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0,
+            "description": "Per-row edit revision; combine this resource id and version as X-Expected-Version: id:version."
           }
         },
         "required": [
@@ -3006,7 +3221,8 @@
           "aircraftTypeId",
           "model",
           "requiredRole",
-          "validUntil"
+          "validUntil",
+          "version"
         ]
       },
       "FlightView": {
@@ -3062,6 +3278,12 @@
           },
           "status": {
             "$ref": "#/components/schemas/FlightStatus"
+          },
+          "version": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0,
+            "description": "Per-row edit revision; combine this resource id and version as X-Expected-Version: id:version."
           }
         },
         "required": [
@@ -3076,7 +3298,8 @@
           "aircraftTypeId",
           "departureTime",
           "arrivalTime",
-          "status"
+          "status",
+          "version"
         ]
       },
       "AssignmentView": {
@@ -3121,6 +3344,12 @@
             "type": "string",
             "format": "date-time",
             "description": "ISO-8601 timestamp with Z or explicit offset on input. Responses normalize to UTC Z."
+          },
+          "version": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0,
+            "description": "Per-row edit revision; combine this resource id and version as X-Expected-Version: id:version."
           }
         },
         "required": [
@@ -3132,7 +3361,8 @@
           "dutyStartTime",
           "dutyEndTime",
           "status",
-          "createdAt"
+          "createdAt",
+          "version"
         ]
       },
       "UnavailabilityView": {
@@ -3161,6 +3391,12 @@
           },
           "reason": {
             "type": "string"
+          },
+          "version": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0,
+            "description": "Per-row edit revision; combine this resource id and version as X-Expected-Version: id:version."
           }
         },
         "required": [
@@ -3168,7 +3404,8 @@
           "crewId",
           "startTime",
           "endTime",
-          "reason"
+          "reason",
+          "version"
         ]
       },
       "UnavailabilityConflictView": {
@@ -3432,7 +3669,9 @@
               "NOT_ACCEPTABLE",
               "ORIGIN_NOT_ALLOWED",
               "HOST_NOT_ALLOWED",
-              "INTERNAL_ERROR"
+              "INTERNAL_ERROR",
+              "STALE_VERSION",
+              "PRECONDITION_REQUIRED"
             ]
           },
           "message": {
@@ -3793,7 +4032,7 @@
         }
       },
       "Api409": {
-        "description": "Duplicate or business conflict; assignment rejection includes eligibility",
+        "description": "Duplicate or business conflict; assignment rejection includes eligibility; STALE_VERSION requires reloading and reviewing the edit",
         "content": {
           "application/json": {
             "schema": {
@@ -3804,6 +4043,16 @@
       },
       "Api500": {
         "description": "Internal failure with sanitized message",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ApiError"
+            }
+          }
+        }
+      },
+      "Api428": {
+        "description": "Original edit snapshot required in X-Expected-Version header",
         "content": {
           "application/json": {
             "schema": {

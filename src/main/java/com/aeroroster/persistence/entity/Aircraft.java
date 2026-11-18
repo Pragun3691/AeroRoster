@@ -9,6 +9,14 @@ public class Aircraft {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Version
+    @Column(name = "version", nullable = false)
+    private long version;
+
+    public long getVersion() {
+        return version;
+    }
+
     @Column(name = "registration", nullable = false, length = 24)
     private String registration;
 

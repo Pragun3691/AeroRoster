@@ -11,6 +11,10 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Arrays;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.util.HexFormat;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,6 +61,45 @@ class OpenApiContractTest {
         for (JsonNode path : spec.get("paths")) documented += path.size();
         assertEquals(actual, documented);
         assertEquals(42, actual);
+    }
+
+    @Test
+    void frozenBaselineAndConditionalMutationHeadersMatchImplementation() throws Exception {
+        try (InputStream input = getClass().getResourceAsStream("/static/api/v1/openapi.json")) {
+            String normalized = new String(input.readAllBytes(), StandardCharsets.UTF_8).replace("\r\n", "\n");
+            String digest = HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(normalized.getBytes(StandardCharsets.UTF_8)));
+            assertEquals(Files.readString(Path.of("docs/API_V1_BASELINE.sha256")).strip().split("\\s+")[0], digest,
+                    "Shared API changed: review and update the baseline and team handoff together");
+        }
+        int conditionalCount = 0;
+        for (var entry : mappings.getHandlerMethods().entrySet()) {
+            if (!entry.getValue().getBeanType().getPackageName().equals("com.aeroroster.web.api")) continue;
+            boolean conditional = Arrays.stream(entry.getValue().getMethod().getParameters()).anyMatch(parameter -> {
+                var header = parameter.getAnnotation(org.springframework.web.bind.annotation.RequestHeader.class);
+                return header != null && header.name().equals("X-Expected-Version");
+            });
+            for (String fullPath : entry.getKey().getPatternValues()) {
+                for (var method : entry.getKey().getMethodsCondition().getMethods()) {
+                    JsonNode operation = spec.get("paths").get(fullPath.substring("/api/v1".length())).get(method.name().toLowerCase());
+                    boolean documented = false;
+                    if (operation.has("parameters")) {
+                        for (JsonNode parameter : operation.get("parameters")) {
+                            if (parameter.get("name").asString().equals("X-Expected-Version")) {
+                                assertTrue(parameter.get("required").asBoolean());
+                                documented = true;
+                            }
+                        }
+                    }
+                    assertEquals(conditional, documented, method + " " + fullPath);
+                    if (conditional) {
+                        assertTrue(operation.get("responses").has("428"));
+                        assertTrue(operation.get("responses").has("409"));
+                        conditionalCount++;
+                    }
+                }
+            }
+        }
+        assertEquals(13, conditionalCount);
     }
 
     @Test

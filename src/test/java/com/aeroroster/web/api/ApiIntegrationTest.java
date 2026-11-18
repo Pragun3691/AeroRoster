@@ -49,6 +49,13 @@ class ApiIntegrationTest {
 
     private JsonNode call(String method, String path, Object body, int status) throws Exception {
         var request = MockMvcRequestBuilders.request(HttpMethod.valueOf(method), path).accept(MediaType.APPLICATION_JSON);
+        if (com.aeroroster.support.EditTokens.required(method, path)) {
+            var current = http.perform(MockMvcRequestBuilders.get(com.aeroroster.support.EditTokens.resource(path)))
+                    .andReturn().getResponse();
+            JsonNode snapshot = json.readTree(current.getContentAsString());
+            request.header("X-Expected-Version", current.getStatus() == 200 && snapshot.has("version")
+                    ? snapshot.get("id").asLong() + ":" + snapshot.get("version").asLong() : "1:0");
+        }
         if (body != null) {
             request.contentType(MediaType.APPLICATION_JSON).content(body instanceof String text ? text : json.writeValueAsString(body));
         }

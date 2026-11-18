@@ -10,6 +10,14 @@ public class CrewUnavailability {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Version
+    @Column(name = "version", nullable = false)
+    private long version;
+
+    public long getVersion() {
+        return version;
+    }
+
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "crew_id", nullable = false)
     private Crew crew;

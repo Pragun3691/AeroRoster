@@ -1,4 +1,4 @@
-"""Real HTTP verification of an already-running JAR on 127.0.0.1:18081.
+"""Real HTTP verification of the current backend JAR on 127.0.0.1:18081.
 
 Run the JAR against aeroroster_test first. Uses stdlib Python and installed psql;
 credentials come from TEST_DB_USER/TEST_DB_PASSWORD (never printed). Deletes
@@ -6,6 +6,7 @@ only IDs returned for this run's own fixtures, never resets a database.
 """
 import json
 import os
+import re
 import subprocess
 import uuid
 from urllib.error import HTTPError
@@ -27,11 +28,16 @@ def sql(statement):
     return result.stdout.strip()
 
 
-def request(method, path, body=None, status=200, headers=None, raw=False):
+def request(method, path, body=None, status=200, headers=None, raw=False, conditional=True):
     global checked
+    headers = dict(headers or {})
+    mutation = method in ("PUT", "PATCH", "DELETE") or method == "POST" and path.endswith("/reassignments")
+    if conditional and mutation and "X-Expected-Version" not in headers:
+        current = request("GET", re.sub(r"/(activity|status|cancellation|reassignments|expiry)$", "", path))
+        headers["X-Expected-Version"] = f'{current["id"]}:{current["version"]}'
     data = body.encode() if isinstance(body, str) else json.dumps(body).encode() if body is not None else None
     req = Request(BASE + path, data=data, method=method,
-                  headers={"Content-Type": "application/json", **(headers or {})})
+                  headers={"Content-Type": "application/json", **headers})
     try:
         response = urlopen(req, timeout=20)
     except HTTPError as error:
@@ -76,8 +82,17 @@ def main():
         request("GET", "/api/v1/crew?size=1", headers={"Origin": BASE})
         duplicate = request("POST", "/api/v1/crew", '{"role":"PILOT","role":"COPILOT"}', status=400)
         assert duplicate["code"] == "MALFORMED_JSON"
-        crew = request("POST", "/api/v1/crew", {"name": "Package verification pilot", "role": "PILOT",
-                       "licenseNo": tag, "experienceYears": 3, "contactNo": "9000000000"}, 201)["id"]
+        crew_body = {"name": "Package verification pilot", "role": "PILOT",
+                     "licenseNo": tag, "experienceYears": 3, "contactNo": "9000000000"}
+        snapshot = request("POST", "/api/v1/crew", crew_body, 201)
+        crew = snapshot["id"]
+        crew_path = f"/api/v1/crew/{crew}"
+        request("PUT", crew_path, crew_body, 428, conditional=False)
+        token = {"X-Expected-Version": f'{crew}:{snapshot["version"]}'}
+        request("PUT", crew_path, {**crew_body, "name": "First administrator"}, headers=token)
+        stale = request("PUT", crew_path, {**crew_body, "name": "Stale administrator"}, 409, headers=token)
+        assert stale["code"] == "STALE_VERSION"
+        assert request("GET", crew_path)["name"] == "First administrator"
         request("POST", f"/api/v1/crew/{crew}/qualifications", {"qualificationId": qualification, "validUntil": "2027-12-31"}, 201)
         plane = request("POST", "/api/v1/aircraft", {"registration": tag, "aircraftTypeId": aircraft_type}, 201)["id"]
         details = {"flightNumber": tag, "aircraftId": plane, "sourceAirportId": source,

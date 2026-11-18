@@ -45,13 +45,15 @@ public class CrewController {
     }
 
     @PutMapping(value = "/{crewId}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public CrewView update(@PathVariable @Positive Long crewId, @Valid @RequestBody CrewRequest request) {
-        return crew.update(crewId, request);
+    public CrewView update(@PathVariable @Positive Long crewId, @Valid @RequestBody CrewRequest request,
+            @RequestHeader(name = ApiPreconditions.HEADER, required = false) String expectedVersion) {
+        return crew.update(crewId, request, ApiPreconditions.require(expectedVersion));
     }
 
     @PatchMapping(value = "/{crewId}/activity", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public CrewView activity(@PathVariable @Positive Long crewId, @Valid @RequestBody ActivityRequest request) {
-        return crew.setActive(crewId, request.active());
+    public CrewView activity(@PathVariable @Positive Long crewId, @Valid @RequestBody ActivityRequest request,
+            @RequestHeader(name = ApiPreconditions.HEADER, required = false) String expectedVersion) {
+        return crew.setActive(crewId, request.active(), ApiPreconditions.require(expectedVersion));
     }
 
     @GetMapping("/{crewId}/assignments")

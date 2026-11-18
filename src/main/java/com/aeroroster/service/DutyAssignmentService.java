@@ -97,12 +97,17 @@ public class DutyAssignmentService {
     }
 
     public AssignmentView cancel(Long id) {
+        return cancel(id, null);
+    }
+
+    public AssignmentView cancel(Long id, ExpectedVersion expected) {
         validation.id(id);
         return transactions.write(() -> {
             AssignmentIdentity identity = identity(id);
             locks.crew(identity.crewId());
             lockFlightAndAircraft(identity.flightId());
             DutyAssignment assignment = locks.assignment(id);
+            ExpectedVersion.check(expected, assignment.getId(), assignment.getVersion());
             assignment.setStatus(AssignmentStatus.CANCELLED);
             assignments.flush();
             return ServiceViews.assignment(assignment);
@@ -110,12 +115,17 @@ public class DutyAssignmentService {
     }
 
     public AssignmentView reassign(Long cancelledAssignmentId) {
+        return reassign(cancelledAssignmentId, null);
+    }
+
+    public AssignmentView reassign(Long cancelledAssignmentId, ExpectedVersion expected) {
         validation.id(cancelledAssignmentId);
         return transactions.write(() -> {
             AssignmentIdentity identity = identity(cancelledAssignmentId);
             Crew member = locks.crew(identity.crewId());
             Flight flight = lockFlightAndAircraft(identity.flightId());
             DutyAssignment previous = locks.assignment(cancelledAssignmentId);
+            ExpectedVersion.check(expected, previous.getId(), previous.getVersion());
             if (previous.getStatus() != AssignmentStatus.CANCELLED) {
                 throw new BusinessConflictException("Cancel the previous assignment before reassigning");
             }

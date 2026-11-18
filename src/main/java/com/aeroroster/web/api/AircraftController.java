@@ -44,13 +44,15 @@ public class AircraftController {
     }
 
     @PutMapping(value = "/{aircraftId}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public AircraftView update(@PathVariable @Positive Long aircraftId, @Valid @RequestBody AircraftRequest request) {
-        return aircraft.update(aircraftId, request);
+    public AircraftView update(@PathVariable @Positive Long aircraftId, @Valid @RequestBody AircraftRequest request,
+            @RequestHeader(name = ApiPreconditions.HEADER, required = false) String expectedVersion) {
+        return aircraft.update(aircraftId, request, ApiPreconditions.require(expectedVersion));
     }
 
     @PatchMapping(value = "/{aircraftId}/activity", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public AircraftView activity(@PathVariable @Positive Long aircraftId, @Valid @RequestBody ActivityRequest request) {
-        return aircraft.setActive(aircraftId, request.active());
+    public AircraftView activity(@PathVariable @Positive Long aircraftId, @Valid @RequestBody ActivityRequest request,
+            @RequestHeader(name = ApiPreconditions.HEADER, required = false) String expectedVersion) {
+        return aircraft.setActive(aircraftId, request.active(), ApiPreconditions.require(expectedVersion));
     }
 
     @GetMapping("/{aircraftId}/flights")

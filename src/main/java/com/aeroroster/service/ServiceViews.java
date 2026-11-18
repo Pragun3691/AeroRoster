@@ -10,12 +10,12 @@ final class ServiceViews {
 
     static CrewView crew(Crew crew) {
         return new CrewView(crew.getId(), crew.getName(), crew.getRole(), crew.getLicenseNo(),
-                crew.getExperienceYears(), crew.getContactNo(), crew.isActive());
+                crew.getExperienceYears(), crew.getContactNo(), crew.isActive(), crew.getVersion());
     }
 
     static AircraftView aircraft(Aircraft aircraft) {
         return new AircraftView(aircraft.getId(), aircraft.getRegistration(),
-                aircraft.getAircraftType().getId(), aircraft.getAircraftType().getModel(), aircraft.isActive());
+                aircraft.getAircraftType().getId(), aircraft.getAircraftType().getModel(), aircraft.isActive(), aircraft.getVersion());
     }
 
     static AircraftTypeView aircraftType(AircraftType type) {
@@ -36,7 +36,7 @@ final class ServiceViews {
         Qualification qualification = held.getQualification();
         return new CrewQualificationView(held.getId(), held.getCrew().getId(), qualification.getId(),
                 qualification.getAircraftType().getId(), qualification.getAircraftType().getModel(),
-                qualification.getRequiredRole(), held.getValidUntil());
+                qualification.getRequiredRole(), held.getValidUntil(), held.getVersion());
     }
 
     static FlightView flight(Flight flight) {
@@ -45,13 +45,13 @@ final class ServiceViews {
                 flight.getDestinationAirport().getId(), flight.getDestinationAirport().getIataCode(),
                 flight.getAircraft().getId(), flight.getAircraft().getRegistration(),
                 flight.getAircraft().getAircraftType().getId(), flight.getDepartureTime(),
-                flight.getArrivalTime(), flight.getStatus());
+                flight.getArrivalTime(), flight.getStatus(), flight.getVersion());
     }
 
     static AssignmentView assignment(DutyAssignment assignment) {
         return new AssignmentView(assignment.getId(), assignment.getCrew().getId(),
                 assignment.getFlight().getId(), assignment.getFlight().getFlightNumber(),
                 assignment.getAssignedRole(), assignment.getDutyStartTime(), assignment.getDutyEndTime(),
-                assignment.getStatus(), assignment.getCreatedAt());
+                assignment.getStatus(), assignment.getCreatedAt(), assignment.getVersion());
     }
 }

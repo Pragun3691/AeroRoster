@@ -53,6 +53,17 @@ public class ApiExceptionHandler {
                 List.of(new ApiFieldError(exception.getField(), exception.getMessage())), null);
     }
 
+    @ExceptionHandler(ApiPreconditions.RequiredPreconditionException.class)
+    public ResponseEntity<ApiError> precondition(HttpServletRequest request) {
+        return errors.response(HttpStatus.PRECONDITION_REQUIRED, "PRECONDITION_REQUIRED",
+                "Send X-Expected-Version using the original resource id:version", request, List.of(), null);
+    }
+
+    @ExceptionHandler(StaleVersionException.class)
+    public ResponseEntity<ApiError> stale(StaleVersionException exception, HttpServletRequest request) {
+        return errors.response(HttpStatus.CONFLICT, "STALE_VERSION", exception.getMessage(), request, List.of(), null);
+    }
+
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     public ResponseEntity<ApiError> conversion(MethodArgumentTypeMismatchException exception, HttpServletRequest request) {
         return errors.response(HttpStatus.BAD_REQUEST, "INVALID_PARAMETER", "Parameter has an invalid type or value", request,

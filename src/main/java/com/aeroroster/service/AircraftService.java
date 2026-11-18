@@ -65,10 +65,15 @@ public class AircraftService {
     }
 
     public AircraftView update(Long id, AircraftRequest request) {
+        return update(id, request, null);
+    }
+
+    public AircraftView update(Long id, AircraftRequest request, ExpectedVersion expected) {
         validation.id(id);
         validation.request(request);
         return transactions.write(() -> {
             Aircraft plane = locks.aircraft(id);
+            ExpectedVersion.check(expected, plane.getId(), plane.getVersion());
             AircraftType type = type(request.aircraftTypeId());
             if (!plane.getAircraftType().getId().equals(type.getId()) && flights.existsByAircraftId(id)) {
                 throw new BusinessConflictException("Aircraft type cannot change after the aircraft has referenced flights");
@@ -82,9 +87,14 @@ public class AircraftService {
     }
 
     public AircraftView setActive(Long id, boolean active) {
+        return setActive(id, active, null);
+    }
+
+    public AircraftView setActive(Long id, boolean active, ExpectedVersion expected) {
         validation.id(id);
         return transactions.write(() -> {
             Aircraft plane = locks.aircraft(id);
+            ExpectedVersion.check(expected, plane.getId(), plane.getVersion());
             if (!active && flights.existsByAircraftIdAndStatusAndArrivalTimeAfter(id, FlightStatus.SCHEDULED, clock.instant())) {
                 throw new BusinessConflictException("Aircraft has ongoing or future scheduled flights. Resolve them before deactivation");
             }

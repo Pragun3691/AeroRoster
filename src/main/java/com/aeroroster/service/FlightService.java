@@ -89,10 +89,15 @@ public class FlightService {
     }
 
     public FlightView update(Long id, FlightRequest request) {
+        return update(id, request, null);
+    }
+
+    public FlightView update(Long id, FlightRequest request, ExpectedVersion expected) {
         validation.id(id);
         validate(request);
         return transactions.write(() -> {
             Flight flight = locks.flight(id);
+            ExpectedVersion.check(expected, flight.getId(), flight.getVersion());
             requireScheduled(flight);
             // Lock both the old and requested aircraft, always in ascending ID order.
             List<Aircraft> locked = Stream.of(flight.getAircraft().getId(), request.aircraftId())
@@ -113,13 +118,22 @@ public class FlightService {
         return changeStatus(id, FlightStatus.CANCELLED);
     }
 
+    public FlightView cancel(Long id, ExpectedVersion expected) {
+        return changeStatus(id, FlightStatus.CANCELLED, expected);
+    }
+
     public FlightView changeStatus(Long id, FlightStatus status) {
+        return changeStatus(id, status, null);
+    }
+
+    public FlightView changeStatus(Long id, FlightStatus status, ExpectedVersion expected) {
         validation.id(id);
         if (status == null) {
             throw new InvalidInputException("Flight status is required");
         }
         return transactions.write(() -> {
             Flight flight = locks.flight(id);
+            ExpectedVersion.check(expected, flight.getId(), flight.getVersion());
             locks.aircraft(flight.getAircraft().getId());
             if (flight.getStatus() == status) {
                 return ServiceViews.flight(flight);

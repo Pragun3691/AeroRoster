@@ -250,10 +250,14 @@ class BackendWorkflowHttpTest {
     }
 
     private JsonNode call(String method, String path, Object body, int expected) throws Exception {
-        HttpRequest request = HttpRequest.newBuilder(URI.create("http://127.0.0.1:" + port + API + path))
+        HttpRequest.Builder builder = HttpRequest.newBuilder(URI.create("http://127.0.0.1:" + port + API + path))
                 .timeout(Duration.ofSeconds(20)).header("Content-Type", "application/json").header("Accept", "application/json")
-                .method(method, body == null ? HttpRequest.BodyPublishers.noBody() : HttpRequest.BodyPublishers.ofString(json.writeValueAsString(body))).build();
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+                .method(method, body == null ? HttpRequest.BodyPublishers.noBody() : HttpRequest.BodyPublishers.ofString(json.writeValueAsString(body)));
+        if (com.aeroroster.support.EditTokens.required(method, path)) {
+            JsonNode snapshot = call("GET", com.aeroroster.support.EditTokens.resource(path), null, 200);
+            builder.header("X-Expected-Version", snapshot.get("id").asLong() + ":" + snapshot.get("version").asLong());
+        }
+        HttpResponse<String> response = client.send(builder.build(), HttpResponse.BodyHandlers.ofString());
         assertEquals(expected, response.statusCode(), method + " " + path + ": " + response.body());
         if (expected == 201) assertTrue(response.headers().firstValue("Location").orElseThrow().startsWith(API + "/"));
         return response.body().isBlank() ? null : json.readTree(response.body());

@@ -58,12 +58,17 @@ public class CrewUnavailabilityService {
     }
 
     public UnavailabilityView update(Long crewId, Long id, UnavailabilityRequest request) {
+        return update(crewId, id, request, null);
+    }
+
+    public UnavailabilityView update(Long crewId, Long id, UnavailabilityRequest request, ExpectedVersion expected) {
         validation.id(crewId);
         validation.id(id);
         validate(request);
         return transactions.write(() -> {
             locks.crew(crewId);
             CrewUnavailability period = locks.unavailability(crewId, id);
+            ExpectedVersion.check(expected, period.getId(), period.getVersion());
             checkConflicts(crewId, request, id);
             apply(period, request);
             unavailability.flush();
@@ -72,11 +77,16 @@ public class CrewUnavailabilityService {
     }
 
     public void remove(Long crewId, Long id) {
+        remove(crewId, id, null);
+    }
+
+    public void remove(Long crewId, Long id, ExpectedVersion expected) {
         validation.id(crewId);
         validation.id(id);
         transactions.write(() -> {
             locks.crew(crewId);
             CrewUnavailability period = locks.unavailability(crewId, id);
+            ExpectedVersion.check(expected, period.getId(), period.getVersion());
             unavailability.delete(period);
             unavailability.flush();
             return null;
@@ -120,7 +130,7 @@ public class CrewUnavailabilityService {
 
     private UnavailabilityView view(CrewUnavailability period) {
         return new UnavailabilityView(period.getId(), period.getCrew().getId(), period.getStartTime(),
-                period.getEndTime(), period.getReason());
+                period.getEndTime(), period.getReason(), period.getVersion());
     }
 
     public Page<UnavailabilityView> list(Long crewId, Pageable pageable) {

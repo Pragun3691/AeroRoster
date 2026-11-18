@@ -9,6 +9,14 @@ public class Crew {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Version
+    @Column(name = "version", nullable = false)
+    private long version;
+
+    public long getVersion() {
+        return version;
+    }
+
     @Column(name = "name", nullable = false, length = 100)
     private String name;
 

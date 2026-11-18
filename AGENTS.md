@@ -10,5 +10,7 @@
 - Treat every crew assignment, cancellation, and later schedule change as an atomic transaction. Use appropriate locking when implementing conflict checks.
 - Scheduling writes require writable READ_COMMITTED transactions. Acquire affected crew rows in ascending ID order, then flight rows, then aircraft rows. Lock owned child records after their parents and refresh decision state. Batch operations must acquire all affected parent locks before processing individual changes.
 - Reuse SchedulingPolicy and persisted duty snapshots for academic scheduling calculations. Preserve cancelled assignment history and recheck eligibility inside the assignment transaction.
+- User-facing edits must preserve the original resource id/version and use the conditional service overload. Compare after acquiring existing locks; never refresh a client's expected version silently. Keep JPA @Version mappings and additive Flyway columns aligned.
+- The API 1.1.0 freeze is recorded in docs/API_V1_BASELINE.sha256. Shared contract changes require coordinated OpenAPI, tests and docs/11_PHASE26_TEAM_HANDOFF.md updates and Member 1 review.
 - User must approve architecture or schema changes before work begins on the next milestone.
 - Definition of done: unit tests, DB migration check, manual end-to-end evidence, updated status docs.

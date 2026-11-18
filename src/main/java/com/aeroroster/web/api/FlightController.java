@@ -47,18 +47,21 @@ public class FlightController {
     }
 
     @PutMapping(value = "/{flightId}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public FlightView update(@PathVariable @Positive Long flightId, @Valid @RequestBody FlightRequest request) {
-        return flights.update(flightId, request);
+    public FlightView update(@PathVariable @Positive Long flightId, @Valid @RequestBody FlightRequest request,
+            @RequestHeader(name = ApiPreconditions.HEADER, required = false) String expectedVersion) {
+        return flights.update(flightId, request, ApiPreconditions.require(expectedVersion));
     }
 
     @PatchMapping(value = "/{flightId}/status", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public FlightView status(@PathVariable @Positive Long flightId, @Valid @RequestBody FlightStatusRequest request) {
-        return flights.changeStatus(flightId, request.status());
+    public FlightView status(@PathVariable @Positive Long flightId, @Valid @RequestBody FlightStatusRequest request,
+            @RequestHeader(name = ApiPreconditions.HEADER, required = false) String expectedVersion) {
+        return flights.changeStatus(flightId, request.status(), ApiPreconditions.require(expectedVersion));
     }
 
     @PutMapping("/{flightId}/cancellation")
-    public FlightView cancel(@PathVariable @Positive Long flightId, @RequestBody(required = false) EmptyRequest ignored) {
-        return flights.cancel(flightId);
+    public FlightView cancel(@PathVariable @Positive Long flightId, @RequestBody(required = false) EmptyRequest ignored,
+            @RequestHeader(name = ApiPreconditions.HEADER, required = false) String expectedVersion) {
+        return flights.cancel(flightId, ApiPreconditions.require(expectedVersion));
     }
 
     @GetMapping("/{flightId}/assignments")

@@ -65,21 +65,23 @@ class ServiceLocks {
     }
 
     Crew crew(Long id) {
-        Crew member = crew.findForUpdate(id)
+        // Refresh obtains the write lock and current version in one step. A locking query
+        // against an already cached @Version entity would reject before it can refresh.
+        Crew member = crew.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Crew member was not found"));
         entityManager.refresh(member, LockModeType.PESSIMISTIC_WRITE);
         return member;
     }
 
     Aircraft aircraft(Long id) {
-        Aircraft plane = aircraft.findForUpdate(id)
+        Aircraft plane = aircraft.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Aircraft was not found"));
         entityManager.refresh(plane, LockModeType.PESSIMISTIC_WRITE);
         return plane;
     }
 
     Flight flight(Long id) {
-        Flight flight = flights.findForUpdate(id)
+        Flight flight = flights.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Flight was not found"));
         entityManager.refresh(flight, LockModeType.PESSIMISTIC_WRITE);
         return flight;
