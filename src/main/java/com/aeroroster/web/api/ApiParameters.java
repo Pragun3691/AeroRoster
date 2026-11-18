@@ -17,6 +17,9 @@ final class ApiParameters {
         if (size < 1 || size > 200) {
             throw new ApiParameterException("size", "Size must be between 1 and 200");
         }
+        if ((long) page * size > Integer.MAX_VALUE) {
+            throw new ApiParameterException("page", "Page times size must not exceed 2147483647");
+        }
         return PageRequest.of(page, size);
     }
 

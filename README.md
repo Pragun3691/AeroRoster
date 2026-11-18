@@ -81,5 +81,7 @@ AeroRoster-Phase1/
 - Flight date-times stored as UTC-aware instants (`TIMESTAMPTZ`); UI can display selected local time zones.
 - All crew assignment validation belongs in Java services within a transaction. PostgreSQL constraints enforce primary keys, foreign keys, uniqueness and basic checks.
 - Do not deploy this initial local-only build publicly; authentication/authorization is not yet implemented.
+- API hostnames are restricted to localhost, 127.0.0.1 and IPv6 loopback; any Origin header must match the request origin. These checks do not authenticate clients. Duplicate JSON properties are rejected.
+- Phase 2.5 verification, defects, evidence and team handoff limitations: [backend verification](docs/10_PHASE25_BACKEND_VERIFICATION.md).
 - SQL migrations belong to Flyway; do not enable Hibernate schema generation.
 - Preserve original Oracle archive; this project is a separate codebase.

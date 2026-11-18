@@ -277,6 +277,26 @@ class AssignmentConcurrencyIntegrationTest {
         assertEquals(1, activeCount());
     }
 
+    @Test
+    void rescheduleAndAssignmentSerializeWithoutStaleDutySnapshots() throws Exception {
+        FlightView before = flightService.get(flightIds.getFirst());
+        Instant departure = before.departureTime().plusSeconds(86400);
+        List<Attempt> results = race(() -> assign(0, 0),
+                () -> administer(() -> flightService.update(before.id(), new FlightRequest(before.flightNumber(),
+                        before.sourceAirportId(), before.destinationAirportId(), before.aircraftId(),
+                        departure, departure.plusSeconds(7200))), "active duty assignments"),
+                () -> flights.findForUpdate(before.id()).orElseThrow(), "flight");
+        // Assignment always succeeds: if reschedule wins first it must use the newly committed times.
+        assertTrue(results.getFirst().accepted());
+        assertEquals(1, activeCount());
+        FlightView after = flightService.get(before.id());
+        assertEquals(results.get(1).accepted() ? departure : before.departureTime(), after.departureTime());
+        AssignmentView assignment = duties.forFlight(before.id()).getFirst();
+        assertEquals(after.departureTime().minusSeconds(3600), assignment.dutyStartTime());
+        assertEquals(after.arrivalTime().plusSeconds(1800), assignment.dutyEndTime());
+        assertEquals(FlightStatus.SCHEDULED, after.status());
+    }
+
     private AssignmentRequest request(int crewIndex, int flightIndex) {
         return new AssignmentRequest(crewIds.get(crewIndex), flightIds.get(flightIndex), CrewRole.PILOT);
     }

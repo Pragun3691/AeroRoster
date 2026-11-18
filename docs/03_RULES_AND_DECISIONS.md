@@ -49,3 +49,7 @@ Assignment operations use crew → flight → aircraft row locks, then evaluate 
 The owner authorized the REST layer after the Phase 2.3 checkpoint commit. Thin /api/v1 controllers reuse existing service DTOs and business operations. Growing collections use stable PageResponse records and database-backed pagination. Strict JSON binding rejects unknown managed fields, coercion and invalid timestamp shapes. Typed errors map through a shared API error contract, with eligibility details retained on assignment rejection.
 
 The unauthenticated API binds to loopback by default and enforces a same-origin browser policy. OpenAPI and a local documentation viewer are provided without new runtime dependencies. Contracts, security limitations, frontend examples and verification evidence are documented in `09_PHASE24_REST_API.md`.
+
+## Phase 2.5 verification decisions
+
+The independent regression review retains the existing architecture, schema, lock order and illustrative limits. API hostnames are additionally restricted to localhost and numeric loopback to prevent foreign-host same-origin bypasses. Duplicate JSON fields fail binding rather than silently selecting a value. Integrated HTTP, migration, concurrency and packaged-runtime evidence and remaining team integration limits are recorded in `10_PHASE25_BACKEND_VERIFICATION.md`.

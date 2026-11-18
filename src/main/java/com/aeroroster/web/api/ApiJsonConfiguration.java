@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import tools.jackson.core.JsonParser;
 import tools.jackson.core.JsonToken;
+import tools.jackson.core.StreamReadFeature;
 import tools.jackson.databind.DeserializationContext;
 import tools.jackson.databind.DeserializationFeature;
 import tools.jackson.databind.MapperFeature;
@@ -27,6 +28,7 @@ public class ApiJsonConfiguration {
                 value -> OffsetDateTime.parse(value).toInstant()));
         dates.addDeserializer(LocalDate.class, new IsoStringDeserializer<>(LocalDate.class, LocalDate::parse));
         return builder -> builder.addModule(dates)
+                .enable(StreamReadFeature.STRICT_DUPLICATE_DETECTION)
                 .enable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,
                         DeserializationFeature.FAIL_ON_TRAILING_TOKENS,
                         DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES)

@@ -34,6 +34,12 @@ public class ApiCorsFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
+        String host = request.getServerName();
+        if (!("localhost".equalsIgnoreCase(host) || "127.0.0.1".equals(host)
+                || "::1".equals(host) || "[::1]".equals(host))) {
+            reject(response, request, "HOST_NOT_ALLOWED", "Use a loopback API hostname");
+            return;
+        }
         boolean crossOrigin;
         try {
             crossOrigin = CorsUtils.isCorsRequest(request);
@@ -41,13 +47,17 @@ public class ApiCorsFilter extends OncePerRequestFilter {
             crossOrigin = true;
         }
         if (crossOrigin) {
-            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-            response.setContentType("application/json");
-            response.setCharacterEncoding("UTF-8");
-            json.writeValue(response.getOutputStream(), errors.body("ORIGIN_NOT_ALLOWED",
-                    "Use the API from the same origin", request, List.of(), null));
+            reject(response, request, "ORIGIN_NOT_ALLOWED", "Use the API from the same origin");
             return;
         }
         chain.doFilter(request, response);
+    }
+
+    private void reject(HttpServletResponse response, HttpServletRequest request, String code, String message)
+            throws IOException {
+        response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        json.writeValue(response.getOutputStream(), errors.body(code, message, request, List.of(), null));
     }
 }

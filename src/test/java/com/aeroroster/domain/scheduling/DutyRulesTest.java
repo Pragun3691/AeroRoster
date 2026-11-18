@@ -19,6 +19,20 @@ class DutyRulesTest {
     private final SchedulingPolicy policy = new SchedulingPolicy(Duration.ofHours(1), Duration.ofMinutes(30),
             Duration.ofHours(10), Duration.ofHours(10), Duration.ofHours(40), Duration.ofHours(14));
 
+    @Test
+    void utcDayCapRemainsIndependentWithRelaxedRollingCaps() {
+        SchedulingPolicy independent = new SchedulingPolicy(Duration.ofHours(1), Duration.ofMinutes(30),
+                Duration.ofHours(10), Duration.ofHours(24), Duration.ofHours(168), Duration.ofHours(14));
+        DutyWindow exact = window("2026-12-01T00:00:00Z", "2026-12-01T14:00:00Z");
+        assertTrue(rules.evaluate(exact, List.of(), List.of(), calculator.assess(exact, List.of()), independent).isEmpty());
+        DutyWindow excess = new DutyWindow(exact.start(), exact.end().plusNanos(1000));
+        assertEquals(List.of(UTC_DAILY_DUTY_LIMIT), rules.evaluate(excess, List.of(), List.of(),
+                calculator.assess(excess, List.of()), independent).stream().map(SchedulingReason::code).toList());
+        DutyWindow midnight = window("2026-12-01T17:00:00Z", "2026-12-02T07:30:00Z");
+        assertEquals(Duration.ofMinutes(450), calculator.assess(midnight, List.of()).maximumUtcDay());
+        assertTrue(rules.evaluate(midnight, List.of(), List.of(), calculator.assess(midnight, List.of()), independent).isEmpty());
+    }
+
     private DutyWindow window(String start, String end) {
         return new DutyWindow(Instant.parse(start), Instant.parse(end));
     }

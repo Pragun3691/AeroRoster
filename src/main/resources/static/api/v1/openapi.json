@@ -3,7 +3,7 @@
   "info": {
     "title": "AeroRoster local development API",
     "version": "1.0.0",
-    "description": "Unauthenticated local development only. Do not publicly deploy as a production-ready service. All scheduling limits are illustrative academic settings. Eligibility never reserves a slot."
+    "description": "Unauthenticated local development only. API host must be localhost, 127.0.0.1 or IPv6 loopback; Origin, when present, must match scheme, host and port. Duplicate JSON properties are rejected. Do not publicly deploy as a production-ready service. All scheduling limits are illustrative academic settings. Eligibility never reserves a slot."
   },
   "servers": [
     {
@@ -105,10 +105,12 @@
             "required": false,
             "schema": {
               "type": "integer",
-              "format": "int64",
+              "format": "int32",
               "minimum": 0,
-              "default": 0
-            }
+              "default": 0,
+              "maximum": 2147483647
+            },
+            "description": "Zero-based page; page times size must not exceed 2147483647 (JPA offset limit). Larger offsets return 400 INVALID_PARAMETER."
           },
           {
             "name": "size",
@@ -116,7 +118,7 @@
             "required": false,
             "schema": {
               "type": "integer",
-              "format": "int64",
+              "format": "int32",
               "minimum": 1,
               "maximum": 200,
               "default": 25
@@ -347,10 +349,12 @@
             "required": false,
             "schema": {
               "type": "integer",
-              "format": "int64",
+              "format": "int32",
               "minimum": 0,
-              "default": 0
-            }
+              "default": 0,
+              "maximum": 2147483647
+            },
+            "description": "Zero-based page; page times size must not exceed 2147483647 (JPA offset limit). Larger offsets return 400 INVALID_PARAMETER."
           },
           {
             "name": "size",
@@ -358,7 +362,7 @@
             "required": false,
             "schema": {
               "type": "integer",
-              "format": "int64",
+              "format": "int32",
               "minimum": 1,
               "maximum": 200,
               "default": 25
@@ -766,10 +770,12 @@
             "required": false,
             "schema": {
               "type": "integer",
-              "format": "int64",
+              "format": "int32",
               "minimum": 0,
-              "default": 0
-            }
+              "default": 0,
+              "maximum": 2147483647
+            },
+            "description": "Zero-based page; page times size must not exceed 2147483647 (JPA offset limit). Larger offsets return 400 INVALID_PARAMETER."
           },
           {
             "name": "size",
@@ -777,7 +783,7 @@
             "required": false,
             "schema": {
               "type": "integer",
-              "format": "int64",
+              "format": "int32",
               "minimum": 1,
               "maximum": 200,
               "default": 25
@@ -999,10 +1005,12 @@
             "required": false,
             "schema": {
               "type": "integer",
-              "format": "int64",
+              "format": "int32",
               "minimum": 0,
-              "default": 0
-            }
+              "default": 0,
+              "maximum": 2147483647
+            },
+            "description": "Zero-based page; page times size must not exceed 2147483647 (JPA offset limit). Larger offsets return 400 INVALID_PARAMETER."
           },
           {
             "name": "size",
@@ -1010,7 +1018,7 @@
             "required": false,
             "schema": {
               "type": "integer",
-              "format": "int64",
+              "format": "int32",
               "minimum": 1,
               "maximum": 200,
               "default": 25
@@ -1453,10 +1461,12 @@
             "required": false,
             "schema": {
               "type": "integer",
-              "format": "int64",
+              "format": "int32",
               "minimum": 0,
-              "default": 0
-            }
+              "default": 0,
+              "maximum": 2147483647
+            },
+            "description": "Zero-based page; page times size must not exceed 2147483647 (JPA offset limit). Larger offsets return 400 INVALID_PARAMETER."
           },
           {
             "name": "size",
@@ -1464,7 +1474,7 @@
             "required": false,
             "schema": {
               "type": "integer",
-              "format": "int64",
+              "format": "int32",
               "minimum": 1,
               "maximum": 200,
               "default": 25
@@ -1754,10 +1764,12 @@
             "required": false,
             "schema": {
               "type": "integer",
-              "format": "int64",
+              "format": "int32",
               "minimum": 0,
-              "default": 0
-            }
+              "default": 0,
+              "maximum": 2147483647
+            },
+            "description": "Zero-based page; page times size must not exceed 2147483647 (JPA offset limit). Larger offsets return 400 INVALID_PARAMETER."
           },
           {
             "name": "size",
@@ -1765,7 +1777,7 @@
             "required": false,
             "schema": {
               "type": "integer",
-              "format": "int64",
+              "format": "int32",
               "minimum": 1,
               "maximum": 200,
               "default": 25
@@ -2215,10 +2227,12 @@
             "required": false,
             "schema": {
               "type": "integer",
-              "format": "int64",
+              "format": "int32",
               "minimum": 0,
-              "default": 0
-            }
+              "default": 0,
+              "maximum": 2147483647
+            },
+            "description": "Zero-based page; page times size must not exceed 2147483647 (JPA offset limit). Larger offsets return 400 INVALID_PARAMETER."
           },
           {
             "name": "size",
@@ -2226,7 +2240,7 @@
             "required": false,
             "schema": {
               "type": "integer",
-              "format": "int64",
+              "format": "int32",
               "minimum": 1,
               "maximum": 200,
               "default": 25
@@ -2575,7 +2589,7 @@
           },
           "experienceYears": {
             "type": "integer",
-            "format": "int64",
+            "format": "int32",
             "minimum": 0
           },
           "contactNo": {
@@ -2802,7 +2816,7 @@
           },
           "experienceYears": {
             "type": "integer",
-            "format": "int64"
+            "format": "int32"
           },
           "contactNo": {
             "type": "string"
@@ -2900,11 +2914,11 @@
           },
           "capacity": {
             "type": "integer",
-            "format": "int64"
+            "format": "int32"
           },
           "minCabinCrew": {
             "type": "integer",
-            "format": "int64"
+            "format": "int32"
           }
         },
         "required": [
@@ -3324,15 +3338,15 @@
           },
           "required": {
             "type": "integer",
-            "format": "int64"
+            "format": "int32"
           },
           "active": {
             "type": "integer",
-            "format": "int64"
+            "format": "int32"
           },
           "missing": {
             "type": "integer",
-            "format": "int64"
+            "format": "int32"
           }
         },
         "required": [
@@ -3417,6 +3431,7 @@
               "UNSUPPORTED_MEDIA_TYPE",
               "NOT_ACCEPTABLE",
               "ORIGIN_NOT_ALLOWED",
+              "HOST_NOT_ALLOWED",
               "INTERNAL_ERROR"
             ]
           },
@@ -3469,12 +3484,12 @@
           },
           "page": {
             "type": "integer",
-            "format": "int64",
+            "format": "int32",
             "minimum": 0
           },
           "size": {
             "type": "integer",
-            "format": "int64",
+            "format": "int32",
             "minimum": 1,
             "maximum": 200
           },
@@ -3485,7 +3500,7 @@
           },
           "totalPages": {
             "type": "integer",
-            "format": "int64",
+            "format": "int32",
             "minimum": 0
           },
           "first": {
@@ -3517,12 +3532,12 @@
           },
           "page": {
             "type": "integer",
-            "format": "int64",
+            "format": "int32",
             "minimum": 0
           },
           "size": {
             "type": "integer",
-            "format": "int64",
+            "format": "int32",
             "minimum": 1,
             "maximum": 200
           },
@@ -3533,7 +3548,7 @@
           },
           "totalPages": {
             "type": "integer",
-            "format": "int64",
+            "format": "int32",
             "minimum": 0
           },
           "first": {
@@ -3565,12 +3580,12 @@
           },
           "page": {
             "type": "integer",
-            "format": "int64",
+            "format": "int32",
             "minimum": 0
           },
           "size": {
             "type": "integer",
-            "format": "int64",
+            "format": "int32",
             "minimum": 1,
             "maximum": 200
           },
@@ -3581,7 +3596,7 @@
           },
           "totalPages": {
             "type": "integer",
-            "format": "int64",
+            "format": "int32",
             "minimum": 0
           },
           "first": {
@@ -3613,12 +3628,12 @@
           },
           "page": {
             "type": "integer",
-            "format": "int64",
+            "format": "int32",
             "minimum": 0
           },
           "size": {
             "type": "integer",
-            "format": "int64",
+            "format": "int32",
             "minimum": 1,
             "maximum": 200
           },
@@ -3629,7 +3644,7 @@
           },
           "totalPages": {
             "type": "integer",
-            "format": "int64",
+            "format": "int32",
             "minimum": 0
           },
           "first": {
@@ -3661,12 +3676,12 @@
           },
           "page": {
             "type": "integer",
-            "format": "int64",
+            "format": "int32",
             "minimum": 0
           },
           "size": {
             "type": "integer",
-            "format": "int64",
+            "format": "int32",
             "minimum": 1,
             "maximum": 200
           },
@@ -3677,7 +3692,7 @@
           },
           "totalPages": {
             "type": "integer",
-            "format": "int64",
+            "format": "int32",
             "minimum": 0
           },
           "first": {
@@ -3709,12 +3724,12 @@
           },
           "page": {
             "type": "integer",
-            "format": "int64",
+            "format": "int32",
             "minimum": 0
           },
           "size": {
             "type": "integer",
-            "format": "int64",
+            "format": "int32",
             "minimum": 1,
             "maximum": 200
           },
@@ -3725,7 +3740,7 @@
           },
           "totalPages": {
             "type": "integer",
-            "format": "int64",
+            "format": "int32",
             "minimum": 0
           },
           "first": {
@@ -3758,7 +3773,7 @@
         }
       },
       "Api403": {
-        "description": "Cross-origin request rejected",
+        "description": "Non-loopback hostname or cross-origin request rejected",
         "content": {
           "application/json": {
             "schema": {

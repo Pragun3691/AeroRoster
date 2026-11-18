@@ -73,7 +73,7 @@ mvn spring-boot:run
 
 The viewer loads only local assets and the same maintained specification used by the contract tests. Its searchable endpoint list includes request/response definitions and the complete schema catalogue. Update the JSON specification alongside controller or DTO changes. Contract tests check all operation paths/methods, record fields, enum values and schema references.
 
-API requests with an Origin header must match the request's scheme, host and port. Cross-origin requests and preflights receive a JSON 403 with ORIGIN_NOT_ALLOWED. Responses do not add permissive Access-Control-Allow-Origin headers. Requests without an Origin header, such as command-line clients, are accepted. This is a browser-origin policy and provides no authentication guarantee.
+API hostnames must be localhost, 127.0.0.1 or IPv6 loopback (::1). Other hostnames receive JSON 403 HOST_NOT_ALLOWED, including when Origin matches or is absent; this closes a DNS rebinding bypass found in Phase 2.5. API requests with an Origin header must also match the request's scheme, host and port. Cross-origin requests and preflights receive a JSON 403 with ORIGIN_NOT_ALLOWED. Responses do not add permissive Access-Control-Allow-Origin headers. Requests without Origin from permitted hostnames, such as command-line clients, are accepted. These checks provide no authentication guarantee and do not prevent direct local HTTP requests. Keep the listener on loopback.
 
 Member 2 should serve the frontend from AeroRoster's origin or configure a development proxy that presents a matching origin to the backend. Use relative API URLs. Opening a frontend from a file URL or another development-server origin directly against this API will be rejected. Changing localhost to 127.0.0.1 also changes the origin, so use one hostname consistently.
 
@@ -85,7 +85,7 @@ Member 2 should serve the frontend from AeroRoster's origin or configure a devel
 - IDs are positive int64 JSON integers. Enums use their exact uppercase names. Numeric enum ordinals, fractional integer values and string-to-number/boolean coercion are rejected.
 - Instant inputs are ISO-8601 strings with Z or an explicit UTC offset. Numeric timestamps, arrays and offset-free local timestamps are rejected. Responses normalize instants to UTC Z. Stored schedule/unavailability times retain the existing maximum microsecond precision rule.
 - LocalDate values use ISO dates such as `2027-12-31`. Qualification expiry may be null. ISO-8601 strings such as PT10H represent durations in eligibility policy/load output.
-- Unknown JSON properties are rejected, including server-managed IDs, activity/status fields outside their dedicated operations, assignment windows and creation timestamps. Build write bodies from the documented input fields rather than copying a GET response unchanged.
+- Unknown and duplicate JSON properties are rejected, including server-managed IDs, activity/status fields outside their dedicated operations, assignment windows and creation timestamps. Build write bodies from the documented input fields rather than copying a GET response unchanged.
 
 ## Request schemas
 
@@ -108,7 +108,7 @@ The qualificationId path identifies the qualification requirement, not CrewQuali
 
 ## Pagination and filters
 
-Growing collections use zero-based page and size parameters. Defaults are page 0 and size 25, with size bounded to 1–200. Ordering is fixed by the services. Unknown custom sort parameters do not select entity properties. The response format is shown below.
+Growing collections use zero-based int32 page and size parameters. Defaults are page 0 and size 25, with size bounded to 1–200. The product page times size must not exceed 2147483647 (the JPA offset range); larger offsets return 400 INVALID_PARAMETER for page. An in-range page beyond the data returns an empty page with last true. Ordering is fixed by the services. Unknown custom sort parameters do not select entity properties. The response format is shown below.
 
 ```json
 {
@@ -149,6 +149,7 @@ Handled API failures return application/json with the same record shape. Timesta
 | 400 | INVALID_PARAMETER | Query/path conversion, format or paging failed |
 | 400 | MALFORMED_JSON | Missing/malformed body, unknown fields, invalid enum or JSON value types |
 | 403 | ORIGIN_NOT_ALLOWED | Use a matching origin |
+| 403 | HOST_NOT_ALLOWED | Use localhost, 127.0.0.1 or IPv6 loopback |
 | 404 | NOT_FOUND | Resource/reference or route is absent |
 | 409 | DUPLICATE_RESOURCE | Unique identifier or qualification already exists |
 | 409 | BUSINESS_CONFLICT | State, scheduling or history prevents an operation |

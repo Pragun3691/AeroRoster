@@ -11,6 +11,7 @@ public record PageResponse<T>(List<T> items, int page, int size, long totalEleme
 
     public static <T> PageResponse<T> from(Page<T> result) {
         return new PageResponse<>(result.getContent(), result.getNumber(), result.getSize(),
-                result.getTotalElements(), result.getTotalPages(), result.isFirst(), result.isLast());
+                result.getTotalElements(), result.getTotalPages(), result.isFirst(),
+                (long) result.getNumber() + 1 >= result.getTotalPages());
     }
 }

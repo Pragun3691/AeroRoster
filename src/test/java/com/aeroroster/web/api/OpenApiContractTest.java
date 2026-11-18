@@ -74,6 +74,10 @@ class OpenApiContractTest {
             for (var field : type.getRecordComponents()) {
                 assertTrue(properties.has(field.getName()), type.getSimpleName() + "." + field.getName());
                 assertFalse(field.getType().isAnnotationPresent(jakarta.persistence.Entity.class));
+                if (field.getType() == int.class) {
+                    assertEquals("int32", properties.get(field.getName()).get("format").asString(),
+                            type.getSimpleName() + "." + field.getName());
+                }
             }
         }
     }
