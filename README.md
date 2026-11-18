@@ -1,6 +1,6 @@
 # AeroRoster — Airline Crew Management & Duty Scheduling
 
-Phase 1 foundation is committed at `a6efdb6` and Phase 2.1 persistence at `c4b65d4`. Phase 2.2 adds validated core Java services, DTO contracts and transaction-safe aircraft scheduling. Service operations, policies, test setup and handoff guidance are documented in the implementation notes. [Phase 2.2 notes](docs/07_PHASE22_SERVICES.md)
+Phase 2.2 core services are committed at `0c8f897`. Phase 2.3 adds crew eligibility, assignment/cancellation history, staffing coverage, exact rolling duty-hour/rest checks and crew unavailability. Scheduling settings are illustrative academic rules. Service contracts, configuration and verification are documented in the implementation notes. [Phase 2.3 notes](docs/08_PHASE23_SCHEDULING.md)
 
 Source DBMS project: https://github.com/Pragun3691/airline-crew-dbms
 

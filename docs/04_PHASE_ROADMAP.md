@@ -8,7 +8,7 @@ Deliver: JPA entities and repositories; Crew/Airport/AircraftType/Aircraft/Fligh
 
 - Phase 2.1 persistence is committed at `c4b65d4`.
 - Phase 2.2 core services implement validated administration and transaction-safe aircraft scheduling. Evidence and review status are in `07_PHASE22_SERVICES.md`.
-- Phase 2.3 assignment services require review and approval after Phase 2.2.
+- Phase 2.3 assignment services were authorized after the Phase 2.2 commit. Scheduling implementation and acceptance evidence are in `08_PHASE23_SCHEDULING.md`.
 
 ## Phase 3 — UI workflows
 Deliver: integrated dashboard, search/filter forms, crew and flight detail/edit screens, staffing and conflict explanation, error states, schedule views. Gate: complete browser-based admin journey.

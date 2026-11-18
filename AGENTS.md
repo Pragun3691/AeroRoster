@@ -8,5 +8,7 @@
 - SQL schemas only via additive, versioned Flyway migrations. Never edit an applied migration; create the next version.
 - Avoid data loss and destructive `DROP TABLE` migration scripts.
 - Treat every crew assignment, cancellation, and later schedule change as an atomic transaction. Use appropriate locking when implementing conflict checks.
+- Scheduling writes require writable READ_COMMITTED transactions. Acquire affected crew rows in ascending ID order, then flight rows, then aircraft rows. Lock owned child records after their parents and refresh decision state. Batch operations must acquire all affected parent locks before processing individual changes.
+- Reuse SchedulingPolicy and persisted duty snapshots for academic scheduling calculations. Preserve cancelled assignment history and recheck eligibility inside the assignment transaction.
 - User must approve architecture or schema changes before work begins on the next milestone.
 - Definition of done: unit tests, DB migration check, manual end-to-end evidence, updated status docs.

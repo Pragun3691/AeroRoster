@@ -2,7 +2,6 @@ package com.aeroroster.service;
 
 import com.aeroroster.persistence.entity.Crew;
 import com.aeroroster.persistence.entity.CrewQualification;
-import com.aeroroster.persistence.entity.DutyAssignment;
 import com.aeroroster.persistence.entity.Qualification;
 import com.aeroroster.persistence.repository.CrewQualificationRepository;
 import com.aeroroster.persistence.repository.CrewRepository;
@@ -17,6 +16,7 @@ import com.aeroroster.service.exception.DuplicateResourceException;
 import com.aeroroster.service.exception.ResourceNotFoundException;
 import com.aeroroster.service.validation.ServiceValidation;
 import java.time.LocalDate;
+import java.time.Instant;
 import java.time.ZoneOffset;
 import java.util.List;
 import org.springframework.data.domain.Sort;
@@ -84,12 +84,12 @@ public class QualificationService {
         validation.request(request);
         return transactions.write(() -> {
             Crew member = locks.crew(crewId);
-            CrewQualification held = held(crewId, qualificationId);
+            CrewQualification held = locks.qualification(crewId, qualificationId);
             checkRole(member, held.getQualification());
             LocalDate expiry = request.validUntil();
             if (expiry != null && (held.getValidUntil() == null || expiry.isBefore(held.getValidUntil()))) {
-                boolean invalidatesHistory = history(held).stream().anyMatch(assignment -> expiry.isBefore(
-                        assignment.getFlight().getDepartureTime().atZone(ZoneOffset.UTC).toLocalDate()));
+                boolean invalidatesHistory = history(held).stream().anyMatch(departure -> expiry.isBefore(
+                        departure.atZone(ZoneOffset.UTC).toLocalDate()));
                 if (invalidatesHistory) {
                     throw new BusinessConflictException("Expiry cannot be shortened past a referenced flight's UTC departure date");
                 }
@@ -105,7 +105,7 @@ public class QualificationService {
         validation.id(qualificationId);
         transactions.write(() -> {
             locks.crew(crewId);
-            CrewQualification held = held(crewId, qualificationId);
+            CrewQualification held = locks.qualification(crewId, qualificationId);
             if (!history(held).isEmpty()) {
                 throw new BusinessConflictException("Qualification has assignment history and must be retained");
             }
@@ -115,20 +115,15 @@ public class QualificationService {
         });
     }
 
-    private CrewQualification held(Long crewId, Long qualificationId) {
-        return heldQualifications.findByCrewIdAndQualificationId(crewId, qualificationId)
-                .orElseThrow(() -> new ResourceNotFoundException("Crew qualification was not found"));
-    }
-
     private void checkRole(Crew crew, Qualification qualification) {
         if (crew.getRole() != qualification.getRequiredRole()) {
             throw new BusinessConflictException("Qualification role must match the crew member's role");
         }
     }
 
-    private List<DutyAssignment> history(CrewQualification held) {
+    private List<Instant> history(CrewQualification held) {
         Qualification qualification = held.getQualification();
-        return assignments.findQualificationHistory(held.getCrew().getId(),
+        return assignments.findQualificationDepartureTimes(held.getCrew().getId(),
                 qualification.getAircraftType().getId(), qualification.getRequiredRole());
     }
 }

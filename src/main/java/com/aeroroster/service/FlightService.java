@@ -126,7 +126,7 @@ public class FlightService {
             }
             requireScheduled(flight);
             if (status == FlightStatus.CANCELLED && assignments.existsByFlightIdAndStatus(id, AssignmentStatus.ACTIVE)) {
-                throw new BusinessConflictException("Flight has active duty assignments. Cancellation requires assignment resolution in Phase 2.3");
+                throw new BusinessConflictException("Cancel active duty assignments before cancelling the flight");
             }
             if (status == FlightStatus.COMPLETED && flight.getArrivalTime().isAfter(clock.instant())) {
                 throw new BusinessConflictException("Flight cannot be completed before its scheduled arrival");
