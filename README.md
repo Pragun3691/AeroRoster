@@ -1,6 +1,6 @@
 # AeroRoster — Airline Crew Management & Duty Scheduling
 
-**Status:** Phase 1 starter, NOT the finished application. The original Oracle Live SQL archive stays unchanged.
+Phase 1 foundation is committed at `a6efdb6`. Phase 2.1 implements and verifies the JPA persistence layer. See the current evidence and test setup in the implementation notes. [Phase 2.1 notes](docs/06_PHASE21_PERSISTENCE.md)
 
 Source DBMS project: https://github.com/Pragun3691/airline-crew-dbms
 
@@ -53,7 +53,7 @@ Create a Java-based airline operations application for managing airports, aircra
    mvn test
    ```
 
-**Note:** This starter was generated and structurally checked, but Maven dependencies and PostgreSQL runtime could not be executed in the offline creation environment. Do not mark Phase 1 complete until you run the commands above.
+Phase 1 completion was reported by the project owner. PostgreSQL migration history and seed records were independently checked during Phase 2.1. Integration tests require the separate `aeroroster_test` database described in the [test instructions](docs/06_PHASE21_PERSISTENCE.md#test-setup).
 
 ## Repo layout
 

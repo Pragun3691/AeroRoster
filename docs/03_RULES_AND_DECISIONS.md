@@ -25,3 +25,9 @@ These are not regulatory limits and do not imply certification under DGCA or oth
 ## Unresolved course requirement
 
 If the Java teacher requires *Core Java / Swing / JavaFX* instead of Spring Boot, keep the data model and domain rules but replace the UI/backend architecture accordingly. Get confirmation before Phase 2.
+
+## Phase 2.1 persistence decisions
+
+The project owner explicitly authorized the existing Spring Boot architecture for Phase 2.1 on 18 November 2026. This milestone implements the existing schema without schema changes. Persistence decisions, relationships, repository responsibilities and verification evidence are recorded in `06_PHASE21_PERSISTENCE.md`.
+
+Scheduling validation and stable-order locking remain requirements for the future transactional service milestone. Repository writes alone provide structural persistence and must be composed within those service transactions when the workflows are implemented.
