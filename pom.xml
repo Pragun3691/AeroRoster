@@ -25,5 +25,14 @@
     <dependency><groupId>org.postgresql</groupId><artifactId>postgresql</artifactId><scope>runtime</scope></dependency>
     <dependency><groupId>org.springframework.boot</groupId><artifactId>spring-boot-starter-test</artifactId><scope>test</scope></dependency>
   </dependencies>
-  <build><plugins><plugin><groupId>org.springframework.boot</groupId><artifactId>spring-boot-maven-plugin</artifactId></plugin></plugins></build>
+  <build><plugins>
+    <plugin><groupId>org.springframework.boot</groupId><artifactId>spring-boot-maven-plugin</artifactId></plugin>
+    <plugin>
+      <groupId>org.codehaus.mojo</groupId><artifactId>exec-maven-plugin</artifactId><version>3.5.0</version>
+      <executions>
+        <execution><id>frontend-npm-ci</id><phase>generate-resources</phase><goals><goal>exec</goal></goals><configuration><executable>npm</executable><workingDirectory>${project.basedir}/frontend</workingDirectory><arguments><argument>ci</argument></arguments></configuration></execution>
+        <execution><id>frontend-production-build</id><phase>generate-resources</phase><goals><goal>exec</goal></goals><configuration><executable>npm</executable><workingDirectory>${project.basedir}/frontend</workingDirectory><environmentVariables><VITE_API_BASE_URL>/api/v1</VITE_API_BASE_URL></environmentVariables><arguments><argument>run</argument><argument>build</argument><argument>--</argument><argument>--outDir</argument><argument>../target/classes/static</argument></arguments></configuration></execution>
+      </executions>
+    </plugin>
+  </plugins></build>
 </project>

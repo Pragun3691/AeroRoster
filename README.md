@@ -35,12 +35,13 @@ Create a Java-based airline operations application for managing airports, aircra
    java -version
    mvn -version
    ```
-5. Start the Java app:
+5. Build and start the Java app. Maven's `generate-resources` phase runs `npm ci` and the Vite production build, placing fingerprinted React assets in the packaged Spring Boot static resources:
    ```powershell
-   mvn spring-boot:run
+   mvn package
+   java -jar target/aeroroster-0.1.0-SNAPSHOT.jar
    ```
    Flyway applies `V1`, `V2` and `V3` on startup (or validates migrations already applied). V3 adds edit versions without resetting data. Stop older application builds before upgrading. Go to `http://localhost:8080`.
-   The default bind address is `127.0.0.1`. API documentation is available at `http://127.0.0.1:8080/api-docs/index.html`, with OpenAPI JSON at `/api/v1/openapi.json`. Use same-origin API calls.
+   The default bind address is `127.0.0.1`. The React application and API are both served from `http://127.0.0.1:8080`; API documentation is available at `/api-docs/index.html`, with OpenAPI JSON at `/api/v1/openapi.json`. Use same-origin API calls.
 6. Confirm tables via psql:
    ```sql
    \c aeroroster_dev
