@@ -1,75 +1,18 @@
-import { fireEvent, render, screen } from '@testing-library/react'
+import { render,screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { MemoryRouter, Route, Routes } from 'react-router-dom'
-import { describe, expect, it } from 'vitest'
+import { MemoryRouter,Route,Routes } from 'react-router-dom'
+import { afterEach,beforeEach,describe,expect,it,vi } from 'vitest'
 import { UnavailabilityManagementPage } from './UnavailabilityManagementPage'
-
-const page = (path = '/unavailability') => render(
-  <MemoryRouter initialEntries={[path]}><Routes>
-    <Route path="/unavailability" element={<UnavailabilityManagementPage />} />
-    <Route path="/unavailability/:unavailabilityId" element={<UnavailabilityManagementPage />} />
-  </Routes></MemoryRouter>,
-)
-
-describe('UnavailabilityManagementPage', () => {
-  it('renders metrics, UTC times, and the contract-shaped conflict snapshot', () => {
-    page()
-    expect(screen.getByText('Total periods')).toBeInTheDocument()
-    expect(screen.getAllByText(/UTC/).length).toBeGreaterThan(0)
-    expect(screen.getByText('Conflict reported')).toBeInTheDocument()
-  })
-
-  it('searches, filters, sorts, and shows a no-results state', async () => {
-    const user = userEvent.setup()
-    page()
-    await user.type(screen.getByPlaceholderText(/search crew/i), 'Medical')
-    expect(screen.getByRole('link', { name: 'Vikram Shah' })).toBeInTheDocument()
-    await user.clear(screen.getByPlaceholderText(/search crew/i))
-    await user.selectOptions(screen.getByLabelText('Crew member'), '101')
-    expect(screen.getByRole('link', { name: 'Aarav Mehta' })).toBeInTheDocument()
-    await user.selectOptions(screen.getByLabelText('Sort by'), 'crew')
-    fireEvent.change(screen.getByLabelText('Start date'), { target: { value: '2026-11-01' } })
-    fireEvent.change(screen.getByLabelText('End date'), { target: { value: '2026-11-01' } })
-    expect(screen.getByText(/No unavailability records match/i)).toBeInTheDocument()
-  })
-
-  it('renders detail and unknown-record states', () => {
-    const detail = page('/unavailability/801')
-    expect(screen.getByText('Period details')).toBeInTheDocument()
-    detail.unmount()
-    page('/unavailability/bad')
-    expect(screen.getByText('Unavailability record unavailable')).toBeInTheDocument()
-  })
-
-  it('validates an edit when the end time does not follow the start time', async () => {
-    const user = userEvent.setup()
-    page()
-
-    await user.click(screen.getAllByRole('button', { name: 'Edit' })[0])
-    fireEvent.change(screen.getByLabelText('Start time (UTC)'), { target: { value: '2026-11-22T10:00' } })
-    fireEvent.change(screen.getByLabelText('End time (UTC)'), { target: { value: '2026-11-22T09:00' } })
-    await user.click(screen.getByRole('button', { name: /review demo update/i }))
-
-    expect(screen.getByText('End time must be after start time.')).toBeInTheDocument()
-  })
-
-  it('validates, confirms a local addition, and confirms a removal', async () => {
-    const user = userEvent.setup()
-    const directory = page()
-    await user.click(screen.getByRole('button', { name: /add unavailability/i }))
-    await user.click(screen.getByRole('button', { name: /review demo addition/i }))
-    expect(screen.getByText('Crew member is required.')).toBeInTheDocument()
-    await user.selectOptions(screen.getByLabelText('Crew member'), '101')
-    fireEvent.change(screen.getByLabelText('Start time (UTC)'), { target: { value: '2026-11-26T08:00' } })
-    fireEvent.change(screen.getByLabelText('End time (UTC)'), { target: { value: '2026-11-26T16:00' } })
-    await user.type(screen.getByLabelText('Reason'), 'Leave')
-    await user.click(screen.getByRole('button', { name: /review demo addition/i }))
-    await user.click(screen.getByRole('button', { name: /confirm local demo action/i }))
-    expect(screen.getByText('Total periods')).toBeInTheDocument()
-    directory.unmount()
-    page('/unavailability/801')
-    await user.click(screen.getByRole('button', { name: /review removal/i }))
-    await user.click(screen.getByRole('button', { name: /confirm demo removal/i }))
-    expect(screen.getByText('Unavailability record unavailable')).toBeInTheDocument()
-  })
+import { failure,mockApi } from '../../test/liveApi'
+let api:ReturnType<typeof mockApi>;beforeEach(()=>{api=mockApi()});afterEach(()=>vi.restoreAllMocks())
+const directory=()=>render(<MemoryRouter><UnavailabilityManagementPage/></MemoryRouter>)
+const confirm=async()=>{await userEvent.click(screen.getByText('Review operation'));await userEvent.click(screen.getByText('Confirm operation'))}
+describe('Live unavailability',()=>{
+ it('renders actual crew periods and UTC timestamps',async()=>{directory();expect(await screen.findByText('Annual leave')).toBeInTheDocument();expect(screen.getByText('2026-11-20 00:00:00 UTC')).toBeInTheDocument()})
+ it('filters crew, dates, search and sort',async()=>{directory();await screen.findByText('Annual leave');await userEvent.selectOptions(screen.getByLabelText('Crew member'),'2');expect(screen.getByText('No records match')).toBeInTheDocument();await userEvent.selectOptions(screen.getByLabelText('Crew member'),'ALL');await userEvent.selectOptions(screen.getByLabelText('Sort by'),'end');await userEvent.type(screen.getByLabelText('Start date'),'2026-11-22');expect(screen.getByText('No records match')).toBeInTheDocument()})
+ it('validates required creation fields',async()=>{directory();await screen.findByText('Annual leave');await userEvent.click(screen.getByText('Add unavailability'));await userEvent.click(screen.getByText('Review operation'));expect(api.post).not.toHaveBeenCalled();expect(screen.getByLabelText('Reason')).toBeRequired()})
+ it('preserves editable data and sends UTC request with original version',async()=>{directory();await screen.findByText('Annual leave');await userEvent.click(screen.getByRole('button',{name:'Edit'}));expect(screen.getByLabelText('Reason')).toHaveValue('Annual leave');await confirm();expect(api.put).toHaveBeenCalledWith('/crew/1/unavailability/1',{startTime:'2026-11-20T00:00:00Z',endTime:'2026-11-21T00:00:00Z',reason:'Annual leave'},{headers:{'X-Expected-Version':'1:8'}})})
+ it('displays actual conflict endpoint result with scoped limitations',async()=>{render(<MemoryRouter initialEntries={['/unavailability/1']}><Routes><Route path="/unavailability/:unavailabilityId" element={<UnavailabilityManagementPage/>}/></Routes></MemoryRouter>);await userEvent.click(await screen.findByText('Check period overlap'));expect(await screen.findByText('Overlap reported')).toBeInTheDocument();expect(api.get).toHaveBeenCalledWith('/crew/1/unavailability/conflicts',{params:{start:'2026-11-20T00:00:00Z',end:'2026-11-21T00:00:00Z'}})})
+ it('confirms removal with period identity and handles empty 204',async()=>{directory();await screen.findByText('Annual leave');await userEvent.click(screen.getByText('Review removal'));expect(api.remove).not.toHaveBeenCalled();await confirm();expect(api.remove).toHaveBeenCalledWith('/crew/1/unavailability/1',{headers:{'X-Expected-Version':'1:8'}})})
+ it('keeps input and surfaces active-duty business conflicts',async()=>{directory();await screen.findByText('Annual leave');await userEvent.click(screen.getByRole('button',{name:'Edit'}));api.put.mockRejectedValue(failure(409,'BUSINESS_CONFLICT'));await confirm();expect(await screen.findByRole('alert')).toHaveTextContent('conflict');expect(screen.getByLabelText('Reason')).toHaveValue('Annual leave')})
 })

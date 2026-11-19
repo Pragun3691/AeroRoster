@@ -1,5 +1,7 @@
 # Phase 3.10 - Live backend integration blocker
 
+Historical blocker report: the owner approved and completed the same-origin deployment in [Phase 3.10A](22_PHASE310A_SAME_ORIGIN_DEPLOYMENT.md). Current Phase 3.10 implementation and verification evidence are in [the live integration report](23_PHASE310_LIVE_INTEGRATION.md). The constraints below remain applicable; this earlier stop does not describe the current implementation status.
+
 ## Outcome
 
 No React page was connected to the backend in this phase. The pre-integration security audit identified a blocking deployment-topology requirement that cannot be safely resolved within the frontend-only scope.

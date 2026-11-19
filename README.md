@@ -4,6 +4,8 @@ Phase 2.5 is committed at `48237bf`. Phase 2.6 adds version-checked edits and fr
 
 Source DBMS project: https://github.com/Pragun3691/airline-crew-dbms
 
+Phase 3.10 connects the React management screens to the existing local REST API. Run the packaged Spring Boot application for same-origin frontend/API integration; all browser requests use relative `/api/v1`. Integrated workflows, test evidence and pending browser acceptance are tracked in [the Phase 3.10 report](docs/23_PHASE310_LIVE_INTEGRATION.md). The earlier deployment verification is recorded in [Phase 3.10A](docs/22_PHASE310A_SAME_ORIGIN_DEPLOYMENT.md).
+
 ## Objective
 
 Create a Java-based airline operations application for managing airports, aircraft, crew, qualifications, flights, unavailability, and duty assignments. Prevent invalid assignments (overlap, qualifications, rest, duty hours); later support ranked crew suggestions, schedules and reports.

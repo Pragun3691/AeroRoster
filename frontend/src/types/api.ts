@@ -18,7 +18,7 @@ export interface AirportView { id: number; iataCode: string; name: string; city:
 export interface QualificationView { id: number; aircraftTypeId: number; model: string; requiredRole: BackendCrewRole }
 export interface CrewQualificationView extends VersionedResource { crewId: number; qualificationId: number; aircraftTypeId: number; model: string; requiredRole: BackendCrewRole; validUntil: string | null }
 export interface QualificationGrantRequest { qualificationId: number; validUntil: string | null }
-export interface ExpiryUpdateRequest { validUntil: string }
+export interface ExpiryUpdateRequest { validUntil: string | null }
 export interface FlightRequest { flightNumber: string; sourceAirportId: number; destinationAirportId: number; aircraftId: number; departureTime: string; arrivalTime: string }
 export interface FlightView extends VersionedResource { flightNumber: string; sourceAirportId: number; sourceIataCode: string; destinationAirportId: number; destinationIataCode: string; aircraftId: number; aircraftRegistration: string; aircraftTypeId: number; departureTime: string; arrivalTime: string; status: FlightStatus }
 export interface AssignmentRequest { crewId: number; flightId: number; assignedRole: BackendCrewRole }
