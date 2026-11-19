@@ -1,0 +1,15 @@
+import { render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+import { MemoryRouter, Route, Routes } from 'react-router-dom'
+import { describe, expect, it } from 'vitest'
+import { CrewManagementPage } from './CrewManagementPage'
+const directory = () => render(<MemoryRouter><CrewManagementPage /></MemoryRouter>)
+describe('Crew management', () => {
+  it('renders the crew directory', () => { directory(); expect(screen.getByRole('heading', { name: 'Crew directory' })).toBeInTheDocument(); expect(screen.getByText('Aarav Mehta')).toBeInTheDocument(); expect(screen.getByText('ATPL-IN-4821')).toBeInTheDocument() })
+  it('searches name and licence', async () => { const user = userEvent.setup(); directory(); await user.type(screen.getByPlaceholderText('Search name or licence'), '9184'); expect(screen.getByText('Nisha Rao')).toBeInTheDocument(); expect(screen.queryByText('Aarav Mehta')).not.toBeInTheDocument() })
+  it('filters role and active state', async () => { const user = userEvent.setup(); directory(); const selects = screen.getAllByRole('combobox'); await user.selectOptions(selects[0], 'PILOT'); expect(screen.getByText('Aarav Mehta')).toBeInTheDocument(); expect(screen.queryByText('Nisha Rao')).not.toBeInTheDocument(); await user.selectOptions(selects[1], 'INACTIVE'); expect(screen.getByText('Vikram Shah')).toBeInTheDocument(); expect(screen.queryByText('Aarav Mehta')).not.toBeInTheDocument() })
+  it('validates add crew fields', async () => { const user = userEvent.setup(); directory(); await user.click(screen.getByRole('button', { name: /add crew/i })); await user.click(screen.getByRole('button', { name: /validate crew record/i })); expect(screen.getByText('Name is required.')).toBeInTheDocument(); expect(screen.getByText('Licence number is required.')).toBeInTheDocument(); expect(screen.getByText(/experience must be a whole/i)).toBeInTheDocument() })
+  it('preserves values and validates edits', async () => { const user = userEvent.setup(); directory(); await user.click(screen.getAllByRole('button', { name: 'Edit' })[0]); expect(screen.getByDisplayValue('Aarav Mehta')).toBeInTheDocument(); const inputs = screen.getAllByRole('textbox'); await user.clear(inputs[1]); await user.click(screen.getByRole('button', { name: /validate changes/i })); expect(screen.getByText('Licence number is required.')).toBeInTheDocument() })
+  it('renders profile qualifications and empty assignment history', () => { render(<MemoryRouter initialEntries={['/crew/104']}><Routes><Route path="/crew/:crewId" element={<CrewManagementPage />} /></Routes></MemoryRouter>); expect(screen.getByRole('heading', { name: 'Vikram Shah' })).toBeInTheDocument(); expect(screen.getByText('Qualification summary')).toBeInTheDocument(); expect(screen.getByText('No sample assignment history')).toBeInTheDocument() })
+  it('shows no-results state', async () => { const user = userEvent.setup(); directory(); await user.type(screen.getByPlaceholderText('Search name or licence'), 'not-found'); expect(screen.getByText('No crew records match')).toBeInTheDocument() })
+})

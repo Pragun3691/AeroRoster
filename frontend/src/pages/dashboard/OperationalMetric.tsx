@@ -1,0 +1,3 @@
+import type { DashboardTone } from './dashboardData'
+const accents: Record<DashboardTone, string> = { success: 'border-l-emerald-500', warning: 'border-l-amber-500', error: 'border-l-red-500', info: 'border-l-blue-500', neutral: 'border-l-teal' }
+export function OperationalMetric({ label, value, detail, tone }: { label: string; value: string; detail: string; tone: DashboardTone }) { return <article className={`border border-line border-l-4 bg-white px-4 py-4 ${accents[tone]}`}><p className="text-xs font-bold uppercase tracking-[.12em] text-muted">{label}</p><p className="mt-2 text-2xl font-bold tracking-tight text-ink">{value}</p><p className="mt-1 text-xs text-muted">{detail}</p></article> }
