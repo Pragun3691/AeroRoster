@@ -19,7 +19,7 @@ class SpaHistoryControllerTest {
     @Test
     void rootAndKnownBrowserRoutesForwardToTheSpaEntryPoint() throws Exception {
         for (String route : new String[] {"/", "/dashboard", "/crew", "/crew/101", "/aircraft", "/aircraft/201",
-                "/flights", "/flights/301", "/qualifications", "/qualifications/501", "/assignments", "/assignments/701",
+                "/flights", "/flights/301", "/flights/301/assign", "/qualifications", "/qualifications/501", "/assignments", "/assignments/701",
                 "/unavailability", "/unavailability/801"}) {
             http.perform(MockMvcRequestBuilders.get(route)).andExpect(status().isOk()).andExpect(forwardedUrl("/index.html"));
         }

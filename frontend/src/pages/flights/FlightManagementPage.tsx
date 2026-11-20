@@ -11,7 +11,7 @@ import {
   utcInput,
   utcInstant,
 } from '../../api/live'
-import type { AircraftView, AirportView, FlightRequest, FlightView } from '../../types/api'
+import type { AircraftView, AircraftTypeView, AirportView, FlightRequest, FlightView } from '../../types/api'
 import { Button } from '../../components/common/Controls'
 import {
   Cell,
@@ -60,6 +60,7 @@ function Directory() {
         original={edit === 'new' ? undefined : edit}
         aircraft={state.data.aircraft}
         airports={state.data.airports}
+        types={state.data.types}
         back={back}
       />
     )
@@ -164,13 +165,23 @@ function Directory() {
                 <RecordStatus value={x.status} />
               </Cell>
               <Cell>
-                <Button
-                  secondary
-                  disabled={x.status !== 'SCHEDULED'}
-                  onClick={() => setEdit(x)}
-                >
-                  Edit
-                </Button>
+                <div className="flex items-center gap-2">
+                  <Button
+                    secondary
+                    disabled={x.status !== 'SCHEDULED'}
+                    onClick={() => setEdit(x)}
+                  >
+                    Edit
+                  </Button>
+                  {x.status === 'SCHEDULED' && (
+                    <RecordLink
+                      to={`/flights/${x.id}/assign`}
+                      className="text-xs font-semibold text-teal hover:underline whitespace-nowrap"
+                    >
+                      Assign crew
+                    </RecordLink>
+                  )}
+                </div>
               </Cell>
             </tr>
           ))}
@@ -184,11 +195,13 @@ function FlightForm({
   original,
   aircraft,
   airports,
+  types,
   back,
 }: {
   original?: FlightView
   aircraft: AircraftView[]
   airports: AirportView[]
+  types?: AircraftTypeView[]
   back: () => void
 }) {
   const [v, setV] = useState<FlightRequest>(
@@ -210,6 +223,9 @@ function FlightForm({
           arrivalTime: '',
         }
   )
+
+  const selectedAircraft = aircraft.find(a => a.id === v.aircraftId)
+  const selectedType = types?.find(t => t.id === selectedAircraft?.aircraftTypeId)
 
   return (
     <MutationForm
@@ -264,11 +280,32 @@ function FlightForm({
           <option value="">Select aircraft</option>
           {aircraft.map(x => (
             <option key={x.id} value={x.id}>
-              {x.registration} | {x.active ? 'Active' : 'Inactive'}
+              {x.registration} — {x.model} ({x.active ? 'Active' : 'Inactive'})
             </option>
           ))}
         </select>
       </Field>
+      {selectedAircraft && (
+        <div className="rounded-xl border border-line bg-sand/30 p-4 space-y-2 text-sm" data-testid="aircraft-crew-requirements">
+          <div className="font-semibold text-ink flex items-center justify-between">
+            <span>Aircraft Staffing & Specification: {selectedAircraft.registration} ({selectedAircraft.model})</span>
+            <span className="text-xs px-2.5 py-0.5 rounded-full bg-teal-100 text-teal-800 font-medium">
+              Required complement: {2 + (selectedType?.minCabinCrew ?? 2)} crew
+            </span>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs text-muted">
+            <div><span className="font-semibold text-ink">Registration:</span> {selectedAircraft.registration}</div>
+            <div><span className="font-semibold text-ink">Model / Type:</span> {selectedAircraft.model}</div>
+            <div><span className="font-semibold text-ink">Passenger Capacity:</span> {selectedType?.capacity ?? 'N/A'}</div>
+            <div><span className="font-semibold text-ink">Required Pilot:</span> 1</div>
+            <div><span className="font-semibold text-ink">Required Co-pilot:</span> 1</div>
+            <div><span className="font-semibold text-ink">Required Cabin Crew:</span> {selectedType?.minCabinCrew ?? 2}</div>
+          </div>
+          <p className="text-xs text-muted">
+            Flight will be created with 0 crew assignments (Incomplete coverage). Assignments must be assigned subsequently via guided crew assignment.
+          </p>
+        </div>
+      )}
       {(['departureTime', 'arrivalTime'] as const).map((key, index) => (
         <Field key={key} label={index ? 'Arrival time (UTC)' : 'Departure time (UTC)'}>
           <input
@@ -315,6 +352,7 @@ function Profile({ id }: { id: number }) {
         original={x}
         aircraft={state.data!.aircraft}
         airports={state.data!.airports}
+        types={state.data!.types}
         back={back}
       />
     )
@@ -342,6 +380,12 @@ function Profile({ id }: { id: number }) {
             </p>
             {x.status === 'SCHEDULED' && (
               <div className="flex flex-wrap items-center gap-3 pt-3 border-t border-line">
+                <RecordLink
+                  to={`/flights/${x.id}/assign`}
+                  className="button primary inline-flex items-center"
+                >
+                  Assign crew
+                </RecordLink>
                 <Button secondary onClick={() => setAction('edit')}>
                   Edit
                 </Button>

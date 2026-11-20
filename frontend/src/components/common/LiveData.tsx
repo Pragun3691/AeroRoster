@@ -263,13 +263,15 @@ export function Cell({ children }: { children: ReactNode }) {
 export function RecordLink({
   to,
   children,
+  className,
 }: {
   to: string
   children: ReactNode
+  className?: string
 }) {
   return (
     <Link
-      className="font-semibold text-navy transition-colors hover:text-teal hover:underline"
+      className={className ?? 'font-semibold text-navy transition-colors hover:text-teal hover:underline'}
       to={to}
     >
       {children}

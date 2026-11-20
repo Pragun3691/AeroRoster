@@ -113,7 +113,7 @@ function Directory() {
 
       {shown && (
         <Register
-          headings={['ID', 'Registration', 'Type', 'Manufacturer', 'Capacity', 'Cabin minimum', 'Status', 'Edit']}
+          headings={['ID', 'Registration', 'Type', 'Manufacturer', 'Capacity', 'Cabin minimum', 'Required crew', 'Status', 'Edit']}
           empty={!shown.length}
         >
           {shown.map(x => {
@@ -128,6 +128,7 @@ function Directory() {
                 <Cell>{t?.manufacturer ?? 'Unavailable'}</Cell>
                 <Cell>{t?.capacity ?? 'Unavailable'}</Cell>
                 <Cell>{t?.minCabinCrew ?? 'Unavailable'}</Cell>
+                <Cell>{t ? `1 Pilot · 1 Co-pilot · ${t.minCabinCrew} Cabin crew` : 'Unavailable'}</Cell>
                 <Cell>{x.active ? 'Active' : 'Inactive'}</Cell>
                 <Cell>
                   <Button secondary onClick={() => setEdit(x)}>

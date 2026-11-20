@@ -97,9 +97,19 @@ function Directory() {
   return (
     <div className="space-y-6">
       <LiveHeader title="Assignment management">
-        <Button disabled={!data} onClick={() => setForm(true)}>
-          Review assignment
-        </Button>
+        <div className="flex items-center gap-3">
+          <Button disabled={!data} onClick={() => setForm(true)}>
+            Review assignment
+          </Button>
+          {data && data.flights.length > 0 && (
+            <RecordLink
+              to={`/flights/${data.flights[0].id}/assign`}
+              className="button primary inline-flex items-center"
+            >
+              Guided flight assignment
+            </RecordLink>
+          )}
+        </div>
       </LiveHeader>
 
       <RemoteState state={state} />

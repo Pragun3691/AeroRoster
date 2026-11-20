@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 @Controller
 public class SpaHistoryController {
     @GetMapping(value = {"/dashboard", "/crew", "/crew/{crewId:[0-9]+}", "/aircraft", "/aircraft/{aircraftId:[0-9]+}",
-            "/flights", "/flights/{flightId:[0-9]+}", "/qualifications", "/qualifications/{qualificationId:[0-9]+}",
+            "/flights", "/flights/{flightId:[0-9]+}", "/flights/{flightId:[0-9]+}/assign", "/qualifications", "/qualifications/{qualificationId:[0-9]+}",
             "/assignments", "/assignments/{assignmentId:[0-9]+}", "/unavailability", "/unavailability/{unavailabilityId:[0-9]+}"},
             produces = MediaType.TEXT_HTML_VALUE)
     public String history() {
