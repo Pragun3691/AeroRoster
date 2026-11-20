@@ -2,8 +2,50 @@
 @tailwind components;
 @tailwind utilities;
 
-:root { font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color: #172B3A; background: #F3F6FA; }
-* { box-sizing: border-box; }
-body { margin: 0; min-width: 320px; }
-button, input, select { font: inherit; }
-@layer components { .control { @apply h-10 w-full border border-line bg-white px-3 text-sm text-ink outline-none transition focus:border-teal focus:ring-2 focus:ring-teal/20 sm:w-auto; } .btn-primary { @apply inline-flex h-10 items-center justify-center gap-2 bg-navy px-3.5 text-sm font-semibold text-white transition hover:bg-navy-2 focus:outline-none focus:ring-2 focus:ring-teal focus:ring-offset-2; } .btn-secondary { @apply inline-flex h-10 items-center justify-center gap-2 border border-line bg-white px-3.5 text-sm font-semibold text-ink transition hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-teal focus:ring-offset-2; } .focus-ring { @apply focus:outline-none focus:ring-2 focus:ring-teal focus:ring-offset-2; } }
+:root {
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color: #172B3A;
+  background: #F8FAFC;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  background-color: #F8FAFC;
+}
+
+button, input, select, textarea {
+  font: inherit;
+}
+
+@layer components {
+  .control {
+    @apply h-10 w-full rounded-md border border-line bg-white px-3 text-sm text-ink shadow-xs outline-none transition placeholder:text-muted/60 focus:border-teal focus:ring-2 focus:ring-teal/20 disabled:cursor-not-allowed disabled:bg-slate-50 disabled:text-muted sm:w-auto;
+  }
+
+  .btn-primary {
+    @apply inline-flex h-10 items-center justify-center gap-2 rounded-md bg-navy px-4 text-sm font-semibold text-white shadow-xs transition hover:bg-navy-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-teal focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-navy disabled:shadow-none;
+  }
+
+  .btn-secondary {
+    @apply inline-flex h-10 items-center justify-center gap-2 rounded-md border border-line bg-white px-4 text-sm font-semibold text-ink shadow-xs transition hover:border-slate-300 hover:bg-slate-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-teal focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-white;
+  }
+
+  .focus-ring {
+    @apply focus:outline-none focus-visible:ring-2 focus-visible:ring-teal focus-visible:ring-offset-2;
+  }
+
+  .panel-card {
+    @apply overflow-hidden rounded-lg border border-line bg-white shadow-card transition;
+  }
+
+  .panel-header {
+    @apply border-b border-line bg-slate-50/60 px-5 py-3.5 text-sm font-semibold text-ink sm:text-base;
+  }
+}
