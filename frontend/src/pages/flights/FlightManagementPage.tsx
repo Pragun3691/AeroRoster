@@ -147,7 +147,7 @@ function Directory() {
 
       {shown && (
         <Register
-          headings={['Flight', 'Route', 'Departure', 'Arrival', 'Aircraft', 'Status', 'Edit']}
+          headings={['Flight', 'Route', 'Departure', 'Arrival', 'Aircraft', 'Status', 'Actions']}
           empty={!shown.length}
         >
           {shown.map(x => (
@@ -166,21 +166,22 @@ function Directory() {
               </Cell>
               <Cell>
                 <div className="flex items-center gap-2">
-                  <Button
-                    secondary
-                    disabled={x.status !== 'SCHEDULED'}
-                    onClick={() => setEdit(x)}
-                  >
-                    Edit
-                  </Button>
                   {x.status === 'SCHEDULED' && (
                     <RecordLink
                       to={`/flights/${x.id}/assign`}
-                      className="text-xs font-semibold text-teal hover:underline whitespace-nowrap"
+                      className="btn-primary h-8 px-3 text-xs font-semibold whitespace-nowrap inline-flex items-center gap-1.5 shadow-xs"
                     >
                       Assign crew
                     </RecordLink>
                   )}
+                  <Button
+                    secondary
+                    disabled={x.status !== 'SCHEDULED'}
+                    onClick={() => setEdit(x)}
+                    className="h-8 px-2.5 text-xs"
+                  >
+                    Edit
+                  </Button>
                 </div>
               </Cell>
             </tr>
@@ -390,10 +391,10 @@ function Profile({ id }: { id: number }) {
               {utcDisplay(x.departureTime)} to {utcDisplay(x.arrivalTime)}
             </p>
             {x.status === 'SCHEDULED' && (
-              <div className="flex flex-wrap items-center gap-3 pt-3 border-t border-line">
+              <div className="flex flex-wrap items-center gap-3 pt-4 border-t border-line">
                 <RecordLink
                   to={`/flights/${x.id}/assign`}
-                  className="button primary inline-flex items-center"
+                  className="btn-primary"
                 >
                   Assign crew
                 </RecordLink>
