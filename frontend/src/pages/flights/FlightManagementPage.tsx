@@ -233,8 +233,11 @@ function FlightForm({
       done={back}
       close={back}
       prepare={() => {
-        const request = {
-          ...v,
+        const request: FlightRequest = {
+          flightNumber: v.flightNumber.trim(),
+          sourceAirportId: Number(v.sourceAirportId),
+          destinationAirportId: Number(v.destinationAirportId),
+          aircraftId: Number(v.aircraftId),
           departureTime: utcInstant(v.departureTime),
           arrivalTime: utcInstant(v.arrivalTime),
         }
@@ -316,6 +319,14 @@ function FlightForm({
             className="control w-full"
             value={v[key]}
             onChange={e => setV({ ...v, [key]: e.target.value })}
+            onBlur={() => {
+              if (v[key]) {
+                const normalized = utcInput(utcInstant(v[key]))
+                if (normalized && normalized !== v[key]) {
+                  setV(prev => ({ ...prev, [key]: normalized }))
+                }
+              }
+            }}
           />
         </Field>
       ))}

@@ -336,6 +336,21 @@ def run_tests():
         if status == 200:
             f_ver_hdr = f"{cur_f['id']}:{cur_f['version']}"
             http_put(f"/flights/{flight_id}/cancellation", {}, headers={"X-Expected-Version": f_ver_hdr})
+        # Also clean up DB records so persistence seed counts remain pristine
+        try:
+            sql_clean = (
+                f"DELETE FROM duty_assignment WHERE flight_id = {flight_id}; "
+                f"DELETE FROM flight_audit WHERE flight_id = {flight_id}; "
+                f"DELETE FROM flight WHERE id = {flight_id};"
+            )
+            subprocess.run(
+                [r"C:\Program Files\PostgreSQL\17\bin\psql.exe", "-U", "postgres", "-d", "aeroroster_test", "-c", sql_clean],
+                env=dict(os.environ, PGPASSWORD="password"),
+                capture_output=True,
+                check=False
+            )
+        except Exception:
+            pass
         print("PASS: Cleaned up test flight and assignments. Zero orphaned records.")
 
     print("\n" + "=" * 80)

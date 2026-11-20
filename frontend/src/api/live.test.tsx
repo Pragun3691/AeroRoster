@@ -31,4 +31,13 @@ describe('live reference data', () => {
     expect(roleLabels.COPILOT).toBe('Co-pilot')
     expect(utcInstant(utcInput('2026-11-19T05:30:12.123456Z'))).toBe('2026-11-19T05:30:12.123456Z')
   })
+  it('normalizes space separator, trailing Z, UTC labels, and missing seconds to ISO-8601 UTC with T and Z', () => {
+    expect(utcInstant('2026-12-25 06:00:00')).toBe('2026-12-25T06:00:00Z')
+    expect(utcInstant('2026-12-25 06:00:00 UTC')).toBe('2026-12-25T06:00:00Z')
+    expect(utcInstant('2026-12-25T06:00:00Z')).toBe('2026-12-25T06:00:00Z')
+    expect(utcInstant('2026-12-25T06:00')).toBe('2026-12-25T06:00:00Z')
+    expect(utcInstant('2026-12-25 06:00')).toBe('2026-12-25T06:00:00Z')
+    expect(utcInstant('  2026-12-25T06:00:00  ')).toBe('2026-12-25T06:00:00Z')
+    expect(utcInstant('')).toBe('')
+  })
 })
