@@ -345,7 +345,7 @@ def run_tests():
             )
             subprocess.run(
                 [r"C:\Program Files\PostgreSQL\17\bin\psql.exe", "-U", "postgres", "-d", "aeroroster_test", "-c", sql_clean],
-                env=dict(os.environ, PGPASSWORD="password"),
+                env=dict(os.environ, PGPASSWORD=os.environ.get("TEST_DB_PASSWORD", os.environ.get("PGPASSWORD", ""))),
                 capture_output=True,
                 check=False
             )

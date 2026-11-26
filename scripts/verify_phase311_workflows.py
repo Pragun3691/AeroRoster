@@ -58,7 +58,7 @@ DB_NAME = "aeroroster_test"
 
 DB_USER = "phase310_test"
 
-DB_PASS = "ioXNpkINv2dIeqOJZrfNtSa7vWgCpD97odJZgAtdne4"
+DB_PASS = os.environ.get("TEST_DB_PASSWORD", os.environ.get("PGPASSWORD", ""))
 
 PSQL_EXE = r"C:\Program Files\PostgreSQL\17\bin\psql.exe"
 
